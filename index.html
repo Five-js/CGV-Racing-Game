@@ -1,20 +1,100 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title>Basic 3D World</title>
-  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-  <link rel="stylesheet" type="text/css" href="base.css">
-</head>
-<body>
-  <!-- <script src="https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js"></script>
-  <script src="./libs/three.js"></script> -->
-  <script src="./libs/OrbitControls.js"></script>
-  <script src="./libs/cannon.js"></script>
-	<script src="./libs/CannonDebugRenderer.js"></script>
-  <script src="./main.js" type="module"></script>
-  <div id="gameMenu">
-  </div>
-  <div id="overlay" class="overlay" ></div>
-  <div id="menu"></div>
-</body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <title>Track Racer</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="./css/style.css" />
+
+    <!-- Icons -->
+    <link
+      rel="stylesheet"
+      href="https://unicons.iconscout.com/release/v3.0.6/css/line.css"
+    />
+  </head>
+
+  <body>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js"></script>
+    <script src="./libs/three.js"></script> -->
+    <script src="./libs/OrbitControls.js"></script>
+    <script src="./libs/cannon.js"></script>
+    <script src="./libs/CannonDebugRenderer.js"></script>
+    <script src="./main.js" type="module"></script>
+    <div id="gameMenu">
+    </div>
+    <div id="overlay" class="overlay" ></div>
+    <!-- <div id="menu"></div> -->
+
+    <div id="menu" style="height: 100%;">
+        <!--Menu Buttons-->
+        <div class="buttons">
+        <div class="menu-buttons">
+            <a id="menu_button">Race</a>
+            <button id="controls_button" type="button">Controls</button>
+            <button id="credits_button" type="button">Credits</button>
+        </div>
+        </div>
+
+        <!--Sound Controls-->
+        <div class="sound">
+        <button id="music_button" type="button">
+            <i id="music_off" class="uil uil-music-tune-slash"></i>
+            <i id="music_on" class="uil uil-music-note"></i>
+        </button>
+        <button id="sounds_button" type="button">
+            <i id="sounds_off" class="uil uil-volume-mute"></i>
+            <i id="sounds_on" class="uil uil-volume"></i>
+        </button>
+        </div>
+
+        <!--Controls Div-->
+        <div class="controls-container">
+        <div class="controls">
+            <div class="controls-3"><div class="close" id="close-controls">+</div></div>
+
+            <h1>Controls</h1>
+            <div class="controls-1"><p>W</p></div>
+            <div class="controls-2">
+            <p>A</p>
+            <p>S</p>
+            <p>D</p>
+            </div>
+            <div class="controls-4">
+            <p>W: Accelerate</p>
+            <p>A: Turn Left</p>
+            <p>S: Brake / Reverse</p>
+            <p>D: Turn Right</p>
+            <p>Shift(hold): Boost</p>
+            </div>
+        </div>
+        </div>
+
+        <!--Credits Div-->
+        <div class="credits-container">
+        <div class="credits">
+            <div class="credits-1"><div class="close" id="close-credits">+</div></div>
+            <h1>Credits</h1>
+
+            <h2>Music</h2>
+            <p>Slynk - X Ray Vision</p>
+
+            <h2>Images</h2>
+            <p id="link">https://www.pexels.com/photo/man-wearing-green-helmet-riding-go-kart-821723/</p>
+        </div>
+        </div>
+
+        <audio id="background_music" autoplay loop>
+        <source src="assets/music/X Ray Vision - Slynk.mp3" type="audio/mpeg" />
+        Your browser does not support the audio element.
+        </audio>
+    </div>
+
+  </body>
+
+  <!--JS Scripts-->
+  <script src="js/menu.js"></script>
 </html>

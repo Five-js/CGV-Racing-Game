@@ -57,15 +57,17 @@ class Game {
       document.body.removeChild(this.renderer.domElement);
       isPlaying = false;
       gameMenu.innerHTML = '';
-      var overlay = document.getElementById("overlay");
+      let overlay = document.getElementById("overlay");
       overlay.innerHTML = '';
       overlay.style.display = 'none';
       hasWon = false;
+      let menu = document.getElementById("menu");
+      menu.style.display = 'block';
       handleState();
     }
 
     setUpGameMenu(){
-      this.counter = 120;
+      this.counter = 30;
       this.startTime = new Date();
       this.currentLapStart = this.startTime;
       let gameMenu = document.getElementById('gameMenu');
@@ -91,11 +93,16 @@ class Game {
 
       const game = this;
       if(hasLost){
-        hasLost = false;
         numberOfLaps = 3;
       }
       if(numberOfLaps == 3){
-        this.handleWinOrLoss(true);
+        if(hasLost){
+          hasLost = false;
+          this.handleWinOrLoss(false);
+        }
+        else{
+          this.handleWinOrLoss(true);
+        }
       }
 
       if(numberOfLaps > 3){
@@ -1938,22 +1945,13 @@ function handleState(){
     _APP = new Game();
   }
   else if(!isPlaying){
-    let menu = document.getElementById("menu");
-
-    let heading = document.createElement("H1");
-    heading.innerText = "Racing Game";
-    heading.style.color = "white";
-
-    let startBtn = document.createElement("Button");
-    startBtn.innerText = "Start Game";
+    let startBtn = document.getElementById("menu_button");
     startBtn.onclick = (e) => {
       isPlaying = true;
-      menu.innerHTML = '';
+      let menu = document.getElementById("menu");
+      menu.style.display = 'none';
       handleState();
     };
-
-    menu.appendChild(heading);
-    menu.appendChild(startBtn);
   }
 }
 
