@@ -7,3 +7,10 @@ body {
   padding: 0;
   overscroll-behavior: none;
 }
+
+#gameMenu {
+  color: white;
+  position: absolute;
+  top: 0;
+  right: 0;
+}

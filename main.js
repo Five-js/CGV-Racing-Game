@@ -4,6 +4,8 @@ import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/j
 import {GLTFLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/DRACOLoader.js';
 
+let isPlaying = false;
+
 class Game {
     constructor() {
       // cannon uses this
@@ -14,9 +16,10 @@ class Game {
     }
   
     init() {
-      // TODO: add timer
       // TODO: finish road circuit
-      // TODO: fix camera offset
+      // TODO: quit game without reload (clean up scene)
+
+      this.setUpGameMenu();
       this.scene = new THREE.Scene();
       // visuals set up: shadows, viewport, antialias, etc...
       this.setUpVisuals();
@@ -33,12 +36,33 @@ class Game {
 
       this._thirdPersonCamera = null;
       this._controls = null;
-      this.loadModel();
+      this.loadModels();
   
       
       // animate scene
       this._previousRAF = null;
       this.animate();
+    }
+
+    setUpGameMenu(){
+      this.counter = 60;
+      this.startTime = new Date();
+      let gameMenu = document.getElementById('gameMenu');
+      let stopBtn = document.createElement('Button');
+      let timer = document.createElement('p');
+      timer.innerHTML = `Time left: ${this.counter}`;
+      timer.id = "timer";
+
+      stopBtn.innerHTML = 'Stop Game';
+      stopBtn.onclick = (e) => {
+        // isPlaying = false;
+        // gameMenu.innerHTML = '';
+        // this.renderer.clear();
+        // handleState();
+        window.location.reload();
+      };
+      gameMenu.appendChild(stopBtn);
+      gameMenu.appendChild(timer);
     }
 
     animate(){
@@ -54,7 +78,29 @@ class Game {
 
         this.step(t - this._previousRAF);
         this._previousRAF = t;
+
+        this.updateTimer();
       });
+    }
+
+    updateTimer(){
+      let endTime = new Date();
+      let timeDiff = endTime - this.startTime; //in ms
+      // strip the ms
+      timeDiff /= 1000;
+
+      // get seconds 
+      let seconds = Math.round(timeDiff);
+
+      if(seconds >= 60){
+        this.startTime = new Date();
+      }
+
+      if(seconds >= 1){
+        let timeLeft = this.counter - seconds;
+        let timer = document.getElementById('timer');
+        timer.innerHTML = `Time left: ${timeLeft}`;
+      }
     }
 
     step(timeElapsed) {
@@ -68,7 +114,7 @@ class Game {
     }
   
 
-    loadModel() {
+    loadModels() {
 
       const loader = new GLTFLoader();
 
@@ -81,10 +127,10 @@ class Game {
 
       this.drawCar(loader, y, scene, this._thirdPersonCamera, this._controls);
       this.drawStartLine(loader, y, scene);
-      this.drawTrees(loader, y, scene);
+      // this.drawTrees(loader, y, scene);
       this.drawRoads(loader, y, scene);
-      this.drawCross(loader, y, scene);
-      this.drawBarriers(loader, y, scene);
+      // this.drawCross(loader, y, scene);
+      // this.drawBarriers(loader, y, scene);
 
     }
 
@@ -1018,7 +1064,7 @@ class ThirdPersonCamera {
   }
 
   _CalculateIdealOffset() {
-    const idealOffset = new THREE.Vector3(-15, 20, -30);
+    const idealOffset = new THREE.Vector3(0, 20, -40);
     idealOffset.applyQuaternion(this._params.target.Rotation);
     idealOffset.add(this._params.target.Position);
     return idealOffset;
@@ -1317,8 +1363,31 @@ shape2Mesh(body, castShadow, receiveShadow){
 
 
 
-let _APP = null;
+function handleState(){
+  if(isPlaying){
+    let _APP = new Game();
+  }
+  else if(!isPlaying){
+    let menu = document.getElementById("menu");
+
+    let heading = document.createElement("H1");
+    heading.innerText = "Racing Game";
+    heading.style.color = "white";
+
+    let startBtn = document.createElement("Button");
+    startBtn.innerText = "Start Game";
+    startBtn.onclick = (e) => {
+      isPlaying = true;
+      menu.innerHTML = '';
+      handleState();
+    };
+
+    menu.appendChild(heading);
+    menu.appendChild(startBtn);
+  }
+}
+
 window.addEventListener('DOMContentLoaded', () =>{
-  _APP = new Game();
+    handleState();
 });
   
