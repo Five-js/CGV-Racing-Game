@@ -5,19 +5,24 @@ import {GLTFLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/js
 import { DRACOLoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/DRACOLoader.js';
 
 let isPlaying = false;
+let hasWon = false;
+let hasLost = false;
+let numberOfLaps = 0;
+let _APP = null;
 
 class Game {
     constructor() {
-      // cannon uses this
-      this.useVisuals = true;
-      this.y = -40;
       // call initializing method
       this.init();
     }
   
     init() {
       // TODO: finish road circuit
-      // TODO: quit game without reload (clean up scene)
+      // TODO: load screen
+      
+      // cannon uses this
+      this.useVisuals = true;
+      this.y = -40;
 
       this.setUpGameMenu();
       this.scene = new THREE.Scene();
@@ -37,6 +42,7 @@ class Game {
       this._thirdPersonCamera = null;
       this._controls = null;
       this.loadModels();
+
   
       
       // animate scene
@@ -44,46 +50,116 @@ class Game {
       this.animate();
     }
 
+
+
+    stopGame(){
+      numberOfLaps = 0;
+      document.body.removeChild(this.renderer.domElement);
+      isPlaying = false;
+      gameMenu.innerHTML = '';
+      var overlay = document.getElementById("overlay");
+      overlay.innerHTML = '';
+      overlay.style.display = 'none';
+      hasWon = false;
+      handleState();
+    }
+
     setUpGameMenu(){
-      this.counter = 60;
+      this.counter = 120;
       this.startTime = new Date();
+      this.currentLapStart = this.startTime;
       let gameMenu = document.getElementById('gameMenu');
       let stopBtn = document.createElement('Button');
       let timer = document.createElement('p');
       timer.innerHTML = `Time left: ${this.counter}`;
       timer.id = "timer";
 
+      let laps = document.createElement('p');
+      laps.innerHTML = `Laps: ${numberOfLaps}/3`;
+      laps.id = "laps";
+
       stopBtn.innerHTML = 'Stop Game';
       stopBtn.onclick = (e) => {
-        // isPlaying = false;
-        // gameMenu.innerHTML = '';
-        // this.renderer.clear();
-        // handleState();
-        window.location.reload();
+        this.stopGame();
       };
       gameMenu.appendChild(stopBtn);
       gameMenu.appendChild(timer);
+      gameMenu.appendChild(laps);
     }
 
     animate(){
+
       const game = this;
-      requestAnimationFrame((t) => {
-        if (this._previousRAF === null) {
+      if(hasLost){
+        hasLost = false;
+        numberOfLaps = 3;
+      }
+      if(numberOfLaps == 3){
+        this.handleWinOrLoss(true);
+      }
+
+      if(numberOfLaps > 3){
+        console.log("error");
+      }
+      if(numberOfLaps < 3){
+        requestAnimationFrame((t) => {
+          if (this._previousRAF === null) {
+            this._previousRAF = t;
+          }
+  
+          game.animate()
+          // this.updatePhysics();
+          this.renderer.render(this.scene, this.camera);
+  
+          this.step(t - this._previousRAF);
           this._previousRAF = t;
-        }
+  
+          this.updateTimer();
+  
+        });
+      }
 
-        game.animate()
-        // this.updatePhysics();
-        this.renderer.render(this.scene, this.camera);
+    }
 
-        this.step(t - this._previousRAF);
-        this._previousRAF = t;
+    handleWinOrLoss(isWin){
+      let overlay = document.getElementById('overlay');
+      overlay.innerHTML = '';
 
-        this.updateTimer();
-      });
+      let header = document.createElement('Header');
+      if(isWin){
+        header.innerHTML = "You Won!";
+      }
+      else{
+        header.innerHTML = "You Lost!";
+      }
+      overlay.appendChild(header);
+
+      let restartBtn = document.createElement('Button');
+      let stopBtn = document.createElement('Button');
+
+      if(isWin){
+        restartBtn.innerHTML = "Restart Game";
+      }
+      else{
+        restartBtn.innerHTML = "Try Again";
+      }
+      stopBtn.innerHTML = "Quit Game";
+
+      // remove overlay contents on restart or stop
+      restartBtn.onclick = () => {
+        this.restart();
+      };
+      stopBtn.onclick = () => {
+        this.stopGame();
+      }
+
+      overlay.appendChild(restartBtn);
+      overlay.appendChild(stopBtn);
+      overlay.style.display = "block";
     }
 
     updateTimer(){
+
       let endTime = new Date();
       let timeDiff = endTime - this.startTime; //in ms
       // strip the ms
@@ -92,14 +168,56 @@ class Game {
       // get seconds 
       let seconds = Math.round(timeDiff);
 
-      if(seconds >= 60){
+      let hasLapped = 0;
+      if(hasWon){
+
+        // check if player really laped
+        let diff = endTime - this.currentLapStart; //in ms
+        // strip the ms
+        diff /= 1000;
+
+        // get seconds 
+        hasLapped = Math.round(diff);
+      }
+
+      if(seconds >= 120){
         this.startTime = new Date();
       }
 
       if(seconds >= 1){
         let timeLeft = this.counter - seconds;
+        if(timeLeft<=0){
+          hasLost = true;
+          timeLeft = 0;
+        }
         let timer = document.getElementById('timer');
-        timer.innerHTML = `Time left: ${timeLeft}`;
+        if(timer){
+          timer.innerHTML = `Time left: ${timeLeft}`;
+        }
+      }
+
+      if(hasLapped > 10 && numberOfLaps >= 1 && hasWon){
+        hasWon = false;
+        numberOfLaps = numberOfLaps + 1;
+        this.currentLapStart = new Date();
+        let laps = document.getElementById('laps');
+        if(laps){
+          laps.innerHTML = `Laps: ${numberOfLaps}/3`;
+        }
+      }
+
+      if(hasLapped < 10 && numberOfLaps >= 1 && hasWon){
+        hasWon = false;
+      }
+
+      if(hasWon && numberOfLaps < 3){
+        hasWon = false;
+        numberOfLaps = numberOfLaps + 1;
+        this.currentLapStart = new Date();
+        let laps = document.getElementById('laps');
+        if(laps){
+          laps.innerHTML = `Laps: ${numberOfLaps}/3`;
+        }
       }
     }
 
@@ -111,6 +229,21 @@ class Game {
       }
   
       this._thirdPersonCamera.Update(timeElapsedS);
+    }
+
+    restart(){
+      numberOfLaps = 0;
+      // Hide the overlay
+      var overlay = document.getElementById("overlay");
+      overlay.innerHTML = '';
+      overlay.style.display = 'none';
+
+      // Reinitialize us
+      document.body.removeChild(this.renderer.domElement);
+      let gameMenu = document.getElementById('gameMenu');
+      gameMenu.innerHTML = '';
+      hasWon = false;
+      this.init();
     }
   
 
@@ -125,13 +258,44 @@ class Game {
       let scene = this.scene;
       let y = this.y;
 
+      // this.drawCity(loader, y, scene);
       this.drawCar(loader, y, scene, this._thirdPersonCamera, this._controls);
       this.drawStartLine(loader, y, scene);
       // this.drawTrees(loader, y, scene);
       this.drawRoads(loader, y, scene);
-      // this.drawCross(loader, y, scene);
+      this.drawCross(loader, y, scene);
       // this.drawBarriers(loader, y, scene);
 
+    }
+
+    drawCity(loader, y, scene){
+      const city = './resources/city/scene.gltf';
+      loader.load(
+        // resource URL
+        city,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          // mesh.position.set(5,y-8,-280);
+          mesh.scale.set(8,8,8);
+          // mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
     }
 
     drawCar(loader, y, scene, cam, cntrl){
@@ -253,6 +417,8 @@ class Game {
 
     drawCross(loader, y, scene){
       const roadPiece = './resources/road_crossing/scene.gltf';
+      
+      // first 
       loader.load(
         // resource URL
         roadPiece,
@@ -279,10 +445,208 @@ class Game {
 
         }
       );
+
+      // second
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-443,y-10,-235);
+          mesh.scale.set(4,1,4.5);
+          // mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // third
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-443,y-10,-69);
+          mesh.scale.set(4,1,4.5);
+          // mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // fourth
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-680,y-10,-69);
+          mesh.scale.set(4,1,4.5);
+          // mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // fifth
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-680,y-10,313);
+          mesh.scale.set(4,1,4.5);
+          // mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // sixth
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-370,y-10,313);
+          mesh.scale.set(4,1,4.5);
+          // mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // seventh
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-370,y-10,550);
+          mesh.scale.set(4,1,4.5);
+          // mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // last corner
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(5,y-10,550);
+          mesh.scale.set(4,1,4.5);
+          // mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
     }
 
     drawRoads(loader, y, scene){
       const roadPiece = './resources/road/scene.gltf';
+
+      // first stretch
       loader.load(
         // resource URL
         roadPiece,
@@ -310,6 +674,7 @@ class Game {
         }
       );
 
+      // second hori
       loader.load(
         // resource URL
         roadPiece,
@@ -317,9 +682,209 @@ class Game {
         function ( gltf ) {
 
           let mesh = gltf.scene;
-          mesh.position.set(-110,y-10,-267);
-          mesh.scale.set(15,1,2);
+          mesh.position.set(-218,y-10,-267);
+          mesh.scale.set(30,1,2);
           // mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // third short seg
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-443,y-10,-185);
+          mesh.scale.set(10,1,2);
+          mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // fourth hori
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-560,y-10,-101);
+          mesh.scale.set(15,1,2);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // fifth stretch
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-680,y-10, 90);
+          mesh.rotation.set(0, Math.PI/2, 0);
+          mesh.scale.set(25.5,1,2);
+          
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // sixth backish
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-525,y-10, 280);
+          // mesh.rotation.set(0, Math.PI/2, 0);
+          mesh.scale.set(20,1,2);
+          
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // seventh seg
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-370,y-10, 399);
+          mesh.rotation.set(0, Math.PI/2, 0);
+          mesh.scale.set(15.4,1,2);
+          
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // last hori
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-181,y-10, 518);
+          // mesh.rotation.set(0, Math.PI/2, 0);
+          mesh.scale.set(24.8,1,2);
+          
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // final stretch
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(5,y-10, 230);
+          mesh.rotation.set(0, Math.PI/2, 0);
+          mesh.scale.set(38.8,1,2);
+          
           scene.add( mesh );
 
         },
@@ -802,8 +1367,8 @@ class Game {
       const near = 1.0;
       const far = 1000.0;
       this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-      this.camera.position.set(0, 0, 50);
-      this.camera.lookAt(new THREE.Vector3(0, 0, -50));
+      this.camera.position.set(-450,this.y-10,-180);
+      this.camera.lookAt(new THREE.Vector3(0, 0, 0));
       // this.camera.position.set(0, 0, -400);
       // this.camera.lookAt(new THREE.Vector3(-200, 0, 0));
     }
@@ -904,7 +1469,7 @@ class BasicCharacterController {
     this._params = params;
     this._target = this._params.target;
     this._decceleration = new THREE.Vector3(-0.0005, -0.0001, -5.0);
-    this._acceleration = new THREE.Vector3(1, 0.25, 50.0);
+    this._acceleration = new THREE.Vector3(1, 0.1, 200.0);
     this._velocity = new THREE.Vector3(0, 0, 0);
     this._position = new THREE.Vector3();
 
@@ -985,6 +1550,11 @@ class BasicCharacterController {
 
     this._position.copy(this._target.position);
 
+    if(this._target.position.x <= 55 && this._target.position.x >= -50 && this._target.position.z < -56 && this._target.position.z > -58){
+      hasWon = true;
+    }
+    
+
   }
 
 }
@@ -1024,9 +1594,9 @@ class BasicCharacterControllerInput {
       case 32: // SPACE
         this._keys.space = true;
         break;
-      // case 16: // SHIFT
-      //   this._keys.shift = true;
-      //   break;
+      case 16: // SHIFT
+        this._keys.shift = true;
+        break;
     }
   }
 
@@ -1047,9 +1617,9 @@ class BasicCharacterControllerInput {
       case 32: // SPACE
         this._keys.space = false;
         break;
-      // case 16: // SHIFT
-      //   this._keys.shift = false;
-      //   break;
+      case 16: // SHIFT
+        this._keys.shift = false;
+        break;
     }
   }
 };
@@ -1365,7 +1935,7 @@ shape2Mesh(body, castShadow, receiveShadow){
 
 function handleState(){
   if(isPlaying){
-    let _APP = new Game();
+    _APP = new Game();
   }
   else if(!isPlaying){
     let menu = document.getElementById("menu");
