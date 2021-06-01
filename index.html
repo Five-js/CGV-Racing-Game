@@ -24,6 +24,10 @@
     <script src="./libs/CannonDebugRenderer.js"></script>
     <script src="./main.js" type="module"></script>
 
+    <div id="loading" style="display: none;color: white;text-align: center;width: 100%;height: 100%;opacity: 0.5;background-color: black;">
+      <h1 id="h1" style="margin-top: 20%;">Loading...</h1>
+    </div>
+
     <!--In-Game Menu-->
     <div class="in-game-menu-container">
       <div class="in-game-menu-container-2">
@@ -105,12 +109,12 @@
 
         <div class="car-container-3">
           <div class="car" id="car-1">
-            <div class="image"></div>
+            <div id="c1" class="image"></div>
             <p>Car 1</p>
           </div>
 
-          <div class="car" id="car-2">
-            <div class="image"></div>
+          <div class="car2" id="car-2">
+            <div id="c2" class="image"></div>
             <p>Car 2</p>
           </div>
         </div>

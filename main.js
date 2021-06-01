@@ -9,6 +9,12 @@ let hasWon = false;
 let hasLost = false;
 let numberOfLaps = 0;
 let _APP = null;
+let car1 = 0x0000ff;
+let car1Cabin = 0x000000;
+let car2 = 0xff0000;
+let car2Cabin = 0x333333;
+let car1Or2 = 2;
+
 
 class Game {
     constructor() {
@@ -19,7 +25,11 @@ class Game {
     init() {
       // TODO: finish road circuit
       // TODO: load screen
-      
+
+      // loadingscreen
+      let load = document.getElementById('loading');
+      load.style.display = 'block';
+
       // cannon uses this
       this.useVisuals = true;
       this.y = -40;
@@ -47,6 +57,13 @@ class Game {
       
       // animate scene
       this._previousRAF = null;
+      setInterval(function(){
+        let go = document.getElementById('h1');
+        go.innerHTML = 'GO!!!';
+        setInterval(function(){
+          load.style.display = 'none';
+        },2000);
+      },10000);
       this.animate();
     }
 
@@ -98,6 +115,22 @@ class Game {
     animate(){
 
       const game = this;
+      // requestAnimationFrame((t) => {
+      //   if (this._previousRAF === null) {
+      //     this._previousRAF = t;
+      //   }
+
+      //   game.animate()
+      //   // this.updatePhysics();
+      //   this.renderer.render(this.scene, this.camera);
+
+      //   // this.step(t - this._previousRAF);
+      //   this._previousRAF = t;
+
+      //   // this.updateTimer();
+
+      // });
+      
       if(hasLost){
         numberOfLaps = 3;
       }
@@ -271,52 +304,208 @@ class Game {
       let scene = this.scene;
       let y = this.y;
 
-      // this.drawCity(loader, y, scene);
+      this.drawBuildings(y, scene);
       this.drawCar(loader, y, scene, this._thirdPersonCamera, this._controls);
       this.drawStartLine(loader, y, scene);
-      // this.drawTrees(loader, y, scene);
+
+      // first one
+      this.drawTrees(loader, y, scene, 0, 50);
+
+      // second cluster
+      this.drawTrees(loader, y, scene, -280, 50);
+
+      // 3rd
+      this.drawTrees(loader, y, scene, -500, 250);
+
+      // 4th
+      this.drawTrees(loader, y, scene, -420, 730);
+
+      // strip
+      this.drawTrees(loader, y, scene, 0, 950);
+      this.drawTrees(loader, y, scene, -160, 950);
+
       this.drawRoads(loader, y, scene);
       this.drawCross(loader, y, scene);
-      // this.drawBarriers(loader, y, scene);
+      this.drawBarriers(loader, y, scene);
 
     }
 
-    drawCity(loader, y, scene){
-      const city = './resources/city/scene.gltf';
-      loader.load(
-        // resource URL
-        city,
-        // called when the resource is loaded
-        function ( gltf ) {
+    
+    drawBuildings(y, scene){
+      const building = './resources/buildingTxt/buldingTexture.png';
+      const building2 = './resources/buildingTxt/glassTxt.jpg';
+      const building3 = './resources/buildingTxt/simpleTxt.jpg';
+      const building4= './resources/buildingTxt/res.jpg';
 
-          let mesh = gltf.scene;
-          // mesh.position.set(5,y-8,-280);
-          mesh.scale.set(8,8,8);
-          // mesh.rotation.set(0, Math.PI/2, 0);
-          scene.add( mesh );
+      // first one (middle)
+      this.cluster(0, y, -50, building2, building, building3, building4, scene);
+      // back alone
+      this.cluster(-160, y, 0, building2, building, building3, building4, scene);
+      // back most
+      this.cluster(-320, y, 0, building2, building, building3, building4, scene);
+      // second left most
+      this.cluster(0, y, 110, building2, building, building3, building4, scene);
+      // left most
+      this.cluster(0, y, 270, building2, building, building3, building4, scene);
+      // right most
+      this.cluster(0, y, -210, building2, building, building3, building4, scene);
+      
+    }
 
-        },
-        // called while loading is progressing
-        function ( xhr ) {
+    cluster(x, y, z, building2, building, building3, building4, scene){
+      // first one
+      let texture = new THREE.TextureLoader().load( building2 );
+      let geometry = new THREE.BoxGeometry( 50, 100, 50 );
+      let material = new THREE.MeshBasicMaterial( { map: texture } );
+      let mesh = new THREE.Mesh( geometry, material );
+      mesh.position.set(-150+x,y+40, 50+z);
+      scene.add( mesh );
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+      // 2nd one
+      texture = new THREE.TextureLoader().load( building );
+      geometry = new THREE.BoxGeometry( 80, 80, 80 );
+      material = new THREE.MeshBasicMaterial( { map: texture } );
+      mesh = new THREE.Mesh( geometry, material );
+      mesh.position.set(-150+x,y+30, 130+z);
+      scene.add( mesh );
 
-        },
-        // called when loading has errors
-        function ( error ) {
+      // 3rd 
+      texture = new THREE.TextureLoader().load( building3 );
+      geometry = new THREE.BoxGeometry( 60, 130, 60 );
+      material = new THREE.MeshBasicMaterial( { map: texture } );
+      mesh = new THREE.Mesh( geometry, material );
+      mesh.position.set(-220+x,y+53, 50+z);
+      scene.add( mesh );
 
-          console.log( error );
+      texture = new THREE.TextureLoader().load( building4 );
+      geometry = new THREE.BoxGeometry( 55, 110, 55 );
+      material = new THREE.MeshBasicMaterial( { map: texture } );
+      mesh = new THREE.Mesh( geometry, material );
+      mesh.position.set(-230+x,y+43, 120+z);
+      scene.add( mesh );
+    }
 
-        }
+    Car(colorBody, colorCabin){
+
+      const car = new THREE.Group;
+
+      // backwheel
+      const geometry2 = new THREE.CylinderGeometry( 8, 8, 40, 32 );
+      const material2 = new THREE.MeshBasicMaterial( {color: 0x000000} );
+      let cylinder = new THREE.Mesh( geometry2, material2 );
+      cylinder.rotation.set(0, 0 , Math.PI/2);
+      cylinder.position.z = cylinder.position.z -5;
+      car.add( cylinder );
+
+      // frontwheel
+      let cylinderF = new THREE.Mesh( geometry2, material2 );
+      cylinderF.rotation.set(0, 0 , Math.PI/2);
+      cylinderF.position.z= cylinder.position.z + 33;
+      car.add( cylinderF );
+
+      // const backWheel = new THREE.Mesh(
+      //     new THREE.BoxBufferGeometry(12, 33, 12),
+      //     new THREE.MeshLambertMaterial({color: 0x333333})
+      // );
+      // backWheel.position.z=6;
+      // backWheel.position.x=-18;
+      // car.add(backWheel);
+
+      // const frontWheel = new THREE.Mesh(
+      //     new THREE.BoxBufferGeometry(12, 33, 12),
+      //     new THREE.MeshBasicMaterial({color: 0x333333})
+      // );
+      // frontWheel.position.z=6;
+      // frontWheel.position.x=18;
+      // car.add(frontWheel);
+
+      const main = new THREE.Mesh(
+          new THREE.BoxBufferGeometry(40, 15, 60),
+          new THREE.MeshLambertMaterial({color: colorBody})
       );
-    }
+      main.position.z=12;
+      main.position.y = 8;
+      car.add(main);
+
+      const carFrontTexture = this.getFrontTexture();
+      carFrontTexture.center= new THREE.Vector2(0.5, 0.5);
+      carFrontTexture.rotation = Math.PI/2;
+
+      const carBackTexture = this.getFrontTexture();
+      carBackTexture.center= new THREE.Vector2(0.5, 0.5);
+     carBackTexture.rotation = Math.PI/2;
+
+      const carRightSideTexture = this.getCarSideTexture();
+
+      const carLeftSideTexture = this.getCarSideTexture();
+      carLeftSideTexture.flipY = false;
+
+
+
+      const geometry = new THREE.BoxGeometry(40, 12, 32);
+      const material = new THREE.MeshBasicMaterial( { color: colorCabin } );
+      let cabin = new THREE.Mesh( geometry, material );
+
+
+      // const cabin = new THREE.Mesh(new THREE.BoxBufferGeometry(30, 12, 32),
+      // new THREE.MeshLambertMaterial({color: 0xffffff}));
+      cabin.position.y = 21.5;
+     cabin.position.X=-6;
+     cabin.position.z=15;
+      car.add(cabin);
+
+      return car;
+
+  }
+
+  getFrontTexture(){
+      const canvas = document.createElement("canvas");
+      canvas.width=64;
+      canvas.height=32;
+      const context = canvas.getContext("2d");
+
+      context.fillStyle="#ffffff";
+      context.fillRect(0, 0, 64, 32);
+
+      context.fillStyle="#666666";
+      context.fillRect(8, 8, 48, 24);
+
+      return new THREE.CanvasTexture(canvas);
+
+
+  }
+
+  getCarSideTexture(){
+      const canvas = document.createElement("canvas");
+      canvas.width=128;
+      canvas.height=32;
+      const context = canvas.getContext("2d");
+
+      context.fillStyle="#ffffff";
+      context.fillRect(0, 0, 128, 32);
+
+      context.fillStyle="#666666";
+      context.fillRect(10, 8, 38, 24);
+      context.fillRect(58, 8, 60, 24);
+
+      return new THREE.CanvasTexture(canvas);
+
+
+  }
+  
 
     drawCar(loader, y, scene, cam, cntrl){
-      let geometry = new THREE.BoxBufferGeometry( 2, 2, 4 );
-      let material = new THREE.MeshNormalMaterial();
+      let mesh = null;
+      if(car1Or2==1){
+        mesh = this.Car(car1, car1Cabin);
+      }
+      else{
+        mesh = this.Car(car2,car2Cabin);
+      }
 
-      let mesh = new THREE.Mesh( geometry, material );
-      mesh.position.set(5,y-8,-50);
+      mesh.position.set(5,y-8.5,-50);
+      mesh.scale.set(0.15,0.15,0.15);
+
       const params = {
         camera: this.camera,
         scene: this. scene,
@@ -374,6 +563,8 @@ class Game {
 
     drawBarriers(loader, y, scene){
       const roadPiece = './resources/barrier/scene.gltf';
+
+      // first cluster
       loader.load(
         // resource URL
         roadPiece,
@@ -410,6 +601,384 @@ class Game {
           mesh.position.set(17,y-8,-270);
           mesh.scale.set(4,4,8);
           // mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // second corner
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-455,y-8,-265);
+          mesh.scale.set(4,4,8);
+          // mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-445,y-8,-275);
+          mesh.scale.set(4,4,8);
+          mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // 3rd
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-430,y-8,-100);
+          mesh.scale.set(4,4,8);
+          // mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-443,y-8,-90);
+          mesh.scale.set(4,4,8);
+          mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // 4th
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-690,y-8,-100);
+          mesh.scale.set(4,4,8);
+          // mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-683,y-8,-110);
+          mesh.scale.set(4,4,8);
+          mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // 5th
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-690,y-8, 280);
+          mesh.scale.set(4,4,8);
+          // mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-680,y-8, 293);
+          mesh.scale.set(4,4,8);
+          mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // 6th
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-360,y-8, 280);
+          mesh.scale.set(4,4,8);
+          // mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-370,y-8, 270);
+          mesh.scale.set(4,4,8);
+          mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // 7th
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-383,y-8, 520);
+          mesh.scale.set(4,4,8);
+          // mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(-370,y-8, 530);
+          mesh.scale.set(4,4,8);
+          mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+
+      // last
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(18,y-8, 520);
+          mesh.scale.set(4,4,8);
+          // mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( error );
+
+        }
+      );
+      loader.load(
+        // resource URL
+        roadPiece,
+        // called when the resource is loaded
+        function ( gltf ) {
+
+          let mesh = gltf.scene;
+          mesh.position.set(5,y-8, 530);
+          mesh.scale.set(4,4,8);
+          mesh.rotation.set(0, Math.PI/2, 0);
           scene.add( mesh );
 
         },
@@ -916,193 +1485,8 @@ class Game {
       );
     }
 
-    drawTrees(loader, y, scene){
-      const tree =  './resources/tree/scene.gltf'
-      // going right trees
-      loader.load(
-        // resource URL
-        tree,
-        // called when the resource is loaded
-        function ( gltf ) {
-
-          let mesh = gltf.scene;
-          mesh.position.set(30,y-10,-400);
-          mesh.scale.set(0.03,0.03,0.03);
-          scene.add( mesh );
-
-        },
-        // called while loading is progressing
-        function ( xhr ) {
-
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-        },
-        // called when loading has errors
-        function ( error ) {
-
-          console.log( error );
-
-        }
-      );
-
-      loader.load(
-        // resource URL
-        tree,
-        // called when the resource is loaded
-        function ( gltf ) {
-
-          let mesh = gltf.scene;
-          mesh.position.set(55,y-10,-400);
-          mesh.scale.set(0.03,0.03,0.03);
-          scene.add( mesh );
-
-        },
-        // called while loading is progressing
-        function ( xhr ) {
-
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-        },
-        // called when loading has errors
-        function ( error ) {
-
-          console.log( error );
-
-        }
-      );
-      
-      loader.load(
-        // resource URL
-        tree,
-        // called when the resource is loaded
-        function ( gltf ) {
-
-          let mesh = gltf.scene;
-          mesh.position.set(80,y-10,-400);
-          mesh.scale.set(0.03,0.03,0.03);
-          scene.add( mesh );
-
-        },
-        // called while loading is progressing
-        function ( xhr ) {
-
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-        },
-        // called when loading has errors
-        function ( error ) {
-
-          console.log( error );
-
-        }
-      );
-
-      loader.load(
-        // resource URL
-        tree,
-        // called when the resource is loaded
-        function ( gltf ) {
-
-          let mesh = gltf.scene;
-          mesh.position.set(105,y-10,-400);
-          mesh.scale.set(0.03,0.03,0.03);
-          scene.add( mesh );
-
-        },
-        // called while loading is progressing
-        function ( xhr ) {
-
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-        },
-        // called when loading has errors
-        function ( error ) {
-
-          console.log( error );
-
-        }
-      );
-
-      loader.load(
-        // resource URL
-        tree,
-        // called when the resource is loaded
-        function ( gltf ) {
-
-          let mesh = gltf.scene;
-          mesh.position.set(130,y-10,-400);
-          mesh.scale.set(0.03,0.03,0.03);
-          scene.add( mesh );
-
-        },
-        // called while loading is progressing
-        function ( xhr ) {
-
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-        },
-        // called when loading has errors
-        function ( error ) {
-
-          console.log( error );
-
-        }
-      );
-
-      loader.load(
-        // resource URL
-        tree,
-        // called when the resource is loaded
-        function ( gltf ) {
-
-          let mesh = gltf.scene;
-          mesh.position.set(155,y-10,-400);
-          mesh.scale.set(0.03,0.03,0.03);
-          scene.add( mesh );
-
-        },
-        // called while loading is progressing
-        function ( xhr ) {
-
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-        },
-        // called when loading has errors
-        function ( error ) {
-
-          console.log( error );
-
-        }
-      );
-
-      loader.load(
-        // resource URL
-        tree,
-        // called when the resource is loaded
-        function ( gltf ) {
-
-          let mesh = gltf.scene;
-          mesh.position.set(180,y-10,-400);
-          mesh.scale.set(0.03,0.03,0.03);
-          scene.add( mesh );
-
-        },
-        // called while loading is progressing
-        function ( xhr ) {
-
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-        },
-        // called when loading has errors
-        function ( error ) {
-
-          console.log( error );
-
-        }
-      );
-      
-
-
+    drawTrees(loader, y, scene, x, z){
+      const tree =  './resources/tree/scene.gltf';
       // going left trees
       loader.load(
         // resource URL
@@ -1111,7 +1495,7 @@ class Game {
         function ( gltf ) {
 
           let mesh = gltf.scene;
-          mesh.position.set(5,y-10,-400);
+          mesh.position.set(5+x,y-10,-400+z);
           mesh.scale.set(0.03,0.03,0.03);
           scene.add( mesh );
 
@@ -1137,7 +1521,7 @@ class Game {
         function ( gltf ) {
 
           let mesh = gltf.scene;
-          mesh.position.set(-20,y-10,-400);
+          mesh.position.set(-20+x,y-10,-400+z);
           mesh.scale.set(0.03,0.03,0.03);
           scene.add( mesh );
 
@@ -1163,7 +1547,7 @@ class Game {
         function ( gltf ) {
 
           let mesh = gltf.scene;
-          mesh.position.set(-45,y-10,-400);
+          mesh.position.set(-45+x,y-10,-400+z);
           mesh.scale.set(0.03,0.03,0.03);
           scene.add( mesh );
 
@@ -1189,7 +1573,7 @@ class Game {
         function ( gltf ) {
 
           let mesh = gltf.scene;
-          mesh.position.set(-70,y-10,-400);
+          mesh.position.set(-70+x,y-10,-400+z);
           mesh.scale.set(0.03,0.03,0.03);
           scene.add( mesh );
 
@@ -1215,7 +1599,7 @@ class Game {
         function ( gltf ) {
 
           let mesh = gltf.scene;
-          mesh.position.set(-95,y-10,-400);
+          mesh.position.set(-95+x,y-10,-400+z);
           mesh.scale.set(0.03,0.03,0.03);
           scene.add( mesh );
 
@@ -1241,7 +1625,7 @@ class Game {
         function ( gltf ) {
 
           let mesh = gltf.scene;
-          mesh.position.set(-115,y-10,-400);
+          mesh.position.set(-115+x,y-10,-400+z);
           mesh.scale.set(0.03,0.03,0.03);
           scene.add( mesh );
 
@@ -1267,7 +1651,7 @@ class Game {
         function ( gltf ) {
 
           let mesh = gltf.scene;
-          mesh.position.set(-135,y-10,-400);
+          mesh.position.set(-135+x,y-10,-400+z);
           mesh.scale.set(0.03,0.03,0.03);
           scene.add( mesh );
 
@@ -1378,7 +1762,7 @@ class Game {
       const fov = 60;
       const aspect = 1920 / 1080;
       const near = 1.0;
-      const far = 1000.0;
+      const far = 2000.0;
       this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
       this.camera.position.set(-450,this.y-10,-180);
       this.camera.lookAt(new THREE.Vector3(0, 0, 0));
@@ -1447,7 +1831,7 @@ class Game {
       light.shadow.camera.top = 100;
       light.shadow.camera.bottom = -100;
       this.scene.add(light);
-      light = new THREE.AmbientLight(0xFFFFFF, 4.0);
+      light = new THREE.AmbientLight(0x404040);
       this.scene.add(light);
     }
 
@@ -1952,6 +2336,15 @@ function handleState(){
   }
   else if(!isPlaying){
     let startBtn = document.getElementById("start_race_button");
+    let isCar1 = document.getElementById("car-1");
+    let isCar2 = document.getElementById("car-2");
+
+    isCar1.onclick = (e) => {
+      car1Or2 = 1;
+    }
+    isCar2.onclick = (e) => {
+      car1Or2 = 2;
+    }
     startBtn.onclick = (e) => {
       isPlaying = true;
       let menu = document.getElementById("menu");
@@ -1966,4 +2359,3 @@ function handleState(){
 window.addEventListener('DOMContentLoaded', () =>{
     handleState();
 });
-  

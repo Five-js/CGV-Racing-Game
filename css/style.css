@@ -413,6 +413,21 @@ i {
   cursor: pointer;
 }
 
+.car2 {
+  display: block;
+
+  width: 300px;
+  height: 300px;
+
+  border-radius: 5px;
+  margin: 10px;
+  padding: 10px;
+  background-color: transparent;
+
+  transition: ease-in-out 1s;
+  cursor: pointer;
+}
+
 .race-container-2 .track-container .track .image {
   background: url(/assets/background/Locked.png);
   background-size: cover;
@@ -426,7 +441,19 @@ i {
 }
 
 .car .image {
-  background: url(/assets/background/car.png);
+  background: url(/assets/background/1.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  width: 280px;
+  height: 240px;
+
+  cursor: pointer;
+}
+
+.car2 .image {
+  background: url(/assets/background/2.png);
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -457,8 +484,27 @@ i {
   cursor: pointer;
 }
 
+.car2 p {
+  display: flex;
+
+  width: fit-content;
+  height: 40px;
+
+  margin: 0 auto;
+
+  justify-content: center;
+  align-items: center;
+
+  color: #fff;
+  font-size: 25px;
+  font-weight: 800;
+
+  transition: 1s;
+  cursor: pointer;
+}
+
 #track-1 .image {
-  background: url(/assets/background/track.jpg);
+  background: url(/assets/background/track1.png);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -481,6 +527,12 @@ i {
   background-color: rgba(255, 255, 255, 0.5);
   color: #000;
 }
+
+.car2:hover{
+  background-color: rgba(255, 255, 255, 0.5);
+  color: #000;
+}
+
 
 #start_race_button,
 #select_track_button{
