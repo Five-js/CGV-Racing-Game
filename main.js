@@ -283,7 +283,7 @@ class Game {
       // this.drawBuildings(y, scene);
       // this.drawCar(loader, y, scene, this._thirdPersonCamera, this._controls);
       this.drawStartLine(loader, y, scene);
-      // this.drawTrees(loader, y, scene);
+      this.drawTrees(loader, y, scene, 0, 0);
       this.drawRoads(loader, y, scene);
       this.drawCross(loader, y, scene);
       this.drawBarriers(loader, y, scene);
@@ -1330,193 +1330,8 @@ class Game {
       );
     }
 
-    drawTrees(loader, y, scene){
-      const tree =  './resources/tree/scene.gltf'
-      // going right trees
-      loader.load(
-        // resource URL
-        tree,
-        // called when the resource is loaded
-        function ( gltf ) {
-
-          let mesh = gltf.scene;
-          mesh.position.set(30,y-10,-400);
-          mesh.scale.set(0.03,0.03,0.03);
-          scene.add( mesh );
-
-        },
-        // called while loading is progressing
-        function ( xhr ) {
-
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-        },
-        // called when loading has errors
-        function ( error ) {
-
-          console.log( error );
-
-        }
-      );
-
-      loader.load(
-        // resource URL
-        tree,
-        // called when the resource is loaded
-        function ( gltf ) {
-
-          let mesh = gltf.scene;
-          mesh.position.set(55,y-10,-400);
-          mesh.scale.set(0.03,0.03,0.03);
-          scene.add( mesh );
-
-        },
-        // called while loading is progressing
-        function ( xhr ) {
-
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-        },
-        // called when loading has errors
-        function ( error ) {
-
-          console.log( error );
-
-        }
-      );
-      
-      loader.load(
-        // resource URL
-        tree,
-        // called when the resource is loaded
-        function ( gltf ) {
-
-          let mesh = gltf.scene;
-          mesh.position.set(80,y-10,-400);
-          mesh.scale.set(0.03,0.03,0.03);
-          scene.add( mesh );
-
-        },
-        // called while loading is progressing
-        function ( xhr ) {
-
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-        },
-        // called when loading has errors
-        function ( error ) {
-
-          console.log( error );
-
-        }
-      );
-
-      loader.load(
-        // resource URL
-        tree,
-        // called when the resource is loaded
-        function ( gltf ) {
-
-          let mesh = gltf.scene;
-          mesh.position.set(105,y-10,-400);
-          mesh.scale.set(0.03,0.03,0.03);
-          scene.add( mesh );
-
-        },
-        // called while loading is progressing
-        function ( xhr ) {
-
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-        },
-        // called when loading has errors
-        function ( error ) {
-
-          console.log( error );
-
-        }
-      );
-
-      loader.load(
-        // resource URL
-        tree,
-        // called when the resource is loaded
-        function ( gltf ) {
-
-          let mesh = gltf.scene;
-          mesh.position.set(130,y-10,-400);
-          mesh.scale.set(0.03,0.03,0.03);
-          scene.add( mesh );
-
-        },
-        // called while loading is progressing
-        function ( xhr ) {
-
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-        },
-        // called when loading has errors
-        function ( error ) {
-
-          console.log( error );
-
-        }
-      );
-
-      loader.load(
-        // resource URL
-        tree,
-        // called when the resource is loaded
-        function ( gltf ) {
-
-          let mesh = gltf.scene;
-          mesh.position.set(155,y-10,-400);
-          mesh.scale.set(0.03,0.03,0.03);
-          scene.add( mesh );
-
-        },
-        // called while loading is progressing
-        function ( xhr ) {
-
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-        },
-        // called when loading has errors
-        function ( error ) {
-
-          console.log( error );
-
-        }
-      );
-
-      loader.load(
-        // resource URL
-        tree,
-        // called when the resource is loaded
-        function ( gltf ) {
-
-          let mesh = gltf.scene;
-          mesh.position.set(180,y-10,-400);
-          mesh.scale.set(0.03,0.03,0.03);
-          scene.add( mesh );
-
-        },
-        // called while loading is progressing
-        function ( xhr ) {
-
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-        },
-        // called when loading has errors
-        function ( error ) {
-
-          console.log( error );
-
-        }
-      );
-      
-
-
+    drawTrees(loader, y, scene, x, z){
+      const tree =  './resources/maple_tree/scene.gltf';
       // going left trees
       loader.load(
         // resource URL
@@ -1525,7 +1340,7 @@ class Game {
         function ( gltf ) {
 
           let mesh = gltf.scene;
-          mesh.position.set(5,y-10,-400);
+          mesh.position.set(5+x,y-10,-400+z);
           mesh.scale.set(0.03,0.03,0.03);
           scene.add( mesh );
 
@@ -1551,7 +1366,7 @@ class Game {
         function ( gltf ) {
 
           let mesh = gltf.scene;
-          mesh.position.set(-20,y-10,-400);
+          mesh.position.set(-20+x,y-10,-400+z);
           mesh.scale.set(0.03,0.03,0.03);
           scene.add( mesh );
 
@@ -1577,7 +1392,7 @@ class Game {
         function ( gltf ) {
 
           let mesh = gltf.scene;
-          mesh.position.set(-45,y-10,-400);
+          mesh.position.set(-45+x,y-10,-400)+z;
           mesh.scale.set(0.03,0.03,0.03);
           scene.add( mesh );
 
@@ -1603,7 +1418,7 @@ class Game {
         function ( gltf ) {
 
           let mesh = gltf.scene;
-          mesh.position.set(-70,y-10,-400);
+          mesh.position.set(-70+x,y-10,-400+z);
           mesh.scale.set(0.03,0.03,0.03);
           scene.add( mesh );
 
@@ -1629,7 +1444,7 @@ class Game {
         function ( gltf ) {
 
           let mesh = gltf.scene;
-          mesh.position.set(-95,y-10,-400);
+          mesh.position.set(-95+x,y-10,-400+z);
           mesh.scale.set(0.03,0.03,0.03);
           scene.add( mesh );
 
@@ -1655,7 +1470,7 @@ class Game {
         function ( gltf ) {
 
           let mesh = gltf.scene;
-          mesh.position.set(-115,y-10,-400);
+          mesh.position.set(-115+x,y-10,-400+z);
           mesh.scale.set(0.03,0.03,0.03);
           scene.add( mesh );
 
@@ -1681,7 +1496,7 @@ class Game {
         function ( gltf ) {
 
           let mesh = gltf.scene;
-          mesh.position.set(-135,y-10,-400);
+          mesh.position.set(-135+x,y-10,-400+z);
           mesh.scale.set(0.03,0.03,0.03);
           scene.add( mesh );
 
