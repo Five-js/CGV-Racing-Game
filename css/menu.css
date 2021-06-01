@@ -1,0 +1,108 @@
+.in-game-menu-container {
+  position: absolute;
+  display: none;
+
+  width: fit-content;
+  height: auto;
+
+  border-radius: 5px;
+  margin: 5px;
+
+  top: 0;
+  left: 0;
+
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.in-game-menu-container-2 {
+  display: block;
+
+  width: fit-content;
+  height: auto;
+
+  padding: 20px;
+  
+}
+
+/* Buttons */
+.in-game-menu-container .in-game-menu-container-2 button {
+  position: relative;
+
+  width: fit-content;
+  height: auto;
+
+  border-style: solid;
+  border-width: 3px;
+  border-color: #fff;
+
+  margin: 5px;
+  padding: 10px;
+  border-radius: 5px;
+
+  color: #fff;
+  background-color: transparent;
+
+  font-size: 20px;
+  font-weight: 800;
+  text-transform: uppercase;
+  text-decoration: none;
+
+  cursor: pointer;
+  transition: ease-in-out 0.5s;
+}
+
+.in-game-menu-container .in-game-menu-container-2 button:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* Text */
+.in-game-menu-container .in-game-menu-container-2 #gameMenu p {
+  width: fit-content;
+  height: auto;
+
+  margin: 5px 5px;
+  padding: 5px 20px;
+
+  color: #fff;
+  background-color: transparent;
+
+  justify-content: center;
+  align-items: center;
+
+  font-size: 30px;
+  font-weight: 1000;
+  font-style: italic;
+}
+
+.in-game-menu-container .in-game-menu-container-2 #overlay header {
+    width: fit-content;
+    height: auto;
+  
+    margin: 10px auto;
+    margin-top: 30px;
+    padding: 5px 20px;
+  
+    color: #fff;
+    background-color: transparent;
+  
+    justify-content: center;
+    align-items: center;
+  
+    font-size: 30px;
+    font-weight: 600;
+    
+  }
+
+#gameMenu{
+    display: flex;
+}
+
+#overlay{
+    display: flex;
+
+    width: fit-content;
+    height: auto;
+
+    margin: auto;
+}
