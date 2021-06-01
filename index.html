@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <title>Track Racer</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/menu.css" />
+
+    <!-- Icons -->
+    <link
+      rel="stylesheet"
+      href="https://unicons.iconscout.com/release/v3.0.6/css/line.css"
+    />
+  </head>
+
+  <body>
+    <script src="./libs/OrbitControls.js"></script>
+    <script src="./libs/cannon.js"></script>
+    <script src="./libs/CannonDebugRenderer.js"></script>
+    <script src="./main.js" type="module"></script>
+
+    <!--In-Game Menu-->
+    <div class="in-game-menu-container">
+      <div class="in-game-menu-container-2">
+        <div id="gameMenu">
+        
+        </div>
+
+        <div id="overlay" class="overlay">
+          <div id="overlay-2" class="overlay-2"></div>
+        </div>
+
+        <div id="menu" style="height: 100%"></div>
+      </div>
+    </div>
+
+    <!--Menu Buttons-->
+    <div class="buttons">
+      <div class="menu-buttons">
+        <button id="race_button" type="button">Race</button>
+        <button id="controls_button" type="button">Controls</button>
+        <button id="credits_button" type="button">Credits</button>
+      </div>
+    </div>
+
+    <!--Sound Controls-->
+    <div class="sound">
+      <button id="music_button" type="button">
+        <i id="music_off" class="uil uil-music-tune-slash"></i>
+        <i id="music_on" class="uil uil-music-note"></i>
+      </button>
+      <button id="sounds_button" type="button">
+        <i id="sounds_off" class="uil uil-volume-mute"></i>
+        <i id="sounds_on" class="uil uil-volume"></i>
+      </button>
+    </div>
+
+    <div class="back">
+      <button id="back_button" type="button">
+        <i class="uil uil-arrow-left"></i>
+      </button>
+    </div>
+
+    <!--Race Div-->
+    <!--Choose Track-->
+    <div class="race-container">
+      <div class="race-container-2">
+        <h1>Select a Track</h1>
+
+        <div class="track-container">
+          <div class="track" id="track-1">
+            <div class="image"></div>
+            <p>Track 1</p>
+          </div>
+
+          <div class="track" id="track-2">
+            <div class="image"></div>
+            <p>Track 2</p>
+          </div>
+
+          <div class="track" id="track-3">
+            <div class="image"></div>
+            <p>Track 3</p>
+          </div>
+
+          <div class="track" id="track-4">
+            <div class="image"></div>
+            <p>Track 4</p>
+          </div>
+        </div>
+
+        <button id="select_track_button" type="button">Select Track</button>
+      </div>
+    </div>
+
+    <!-- Choose Car-->
+    <div class="car-container">
+      <div class="car-container-2">
+        <h1>Select a Car</h1>
+
+        <div class="car-container-3">
+          <div class="car" id="car-1">
+            <div class="image"></div>
+            <p>Car 1</p>
+          </div>
+
+          <div class="car" id="car-2">
+            <div class="image"></div>
+            <p>Car 2</p>
+          </div>
+        </div>
+
+        <button id="start_race_button" type="button">Start Race</button>
+      </div>
+    </div>
+
+    <!--Controls Div-->
+    <div class="controls-container">
+      <div class="controls">
+        <div class="controls-3">
+          <div class="close" id="close-controls">+</div>
+        </div>
+
+        <h1>Controls</h1>
+        <div class="controls-1"><p>W</p></div>
+
+        <div class="controls-2">
+          <p>A</p>
+          <p>S</p>
+          <p>D</p>
+        </div>
+
+        <div class="controls-5">
+          <p>Shift <i class="uil uil-arrow-up"></i></p>
+        </div>
+
+        <div class="controls-4">
+          <p>W: Accelerate</p>
+          <p>A: Turn Left</p>
+          <p>S: Brake / Reverse</p>
+          <p>D: Turn Right</p>
+          <p>Shift(hold): Boost</p>
+        </div>
+      </div>
+    </div>
+
+    <!--Credits Div-->
+    <div class="credits-container">
+      <div class="credits">
+        <div class="credits-1">
+          <div class="close" id="close-credits">+</div>
+        </div>
+
+        <h1>Credits</h1>
+
+        <h2>Developers</h2>
+        <p>Reitumetse Masilo</p>
+        <p>Vhugala Mudau</p>
+        <p>Ntiyiso Mushwana</p>
+        <p>Vuyo Ncume</p>
+        <p>Othniel Ngobeni</p>
+
+        <h2>Music</h2>
+        <p>Slynk - X Ray Vision</p>
+
+        <h2>Images</h2>
+        <p id="link">
+          https://www.pexels.com/photo/man-wearing-green-helmet-riding-go-kart-821723/
+        </p>
+        <p id="link">
+          https://www.pexels.com/photo/black-top-road-during-sunset-209207/
+        </p>
+      </div>
+    </div>
+
+    <audio id="background_music" autoplay loop>
+      <source src="assets/music/X Ray Vision - Slynk.mp3" type="audio/mpeg" />
+      Your browser does not support the audio element.
+    </audio>
+  </body>
+
+  <!--JS Scripts-->
+  <script src="js/menu.js"></script>
+</html>

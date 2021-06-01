@@ -1,0 +1,11 @@
+Model Information:
+* title:	Simple Road Texture1
+* source:	https://sketchfab.com/3d-models/simple-road-texture1-41b5e535a9f7494a88f0e48819e3b744
+* author:	cassiasilveira2004 (https://sketchfab.com/cassiasilveira2004)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Simple Road Texture1" (https://sketchfab.com/3d-models/simple-road-texture1-41b5e535a9f7494a88f0e48819e3b744) by cassiasilveira2004 (https://sketchfab.com/cassiasilveira2004) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
