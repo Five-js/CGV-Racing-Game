@@ -1,0 +1,11 @@
+Model Information:
+* title:	BMW M4
+* source:	https://sketchfab.com/3d-models/bmw-m4-cb3166713f13498a86e76e6cdfc2d755
+* author:	ishaknapitupulucxr2 (https://sketchfab.com/ishaknapitupulucxr2)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "BMW M4" (https://sketchfab.com/3d-models/bmw-m4-cb3166713f13498a86e76e6cdfc2d755) by ishaknapitupulucxr2 (https://sketchfab.com/ishaknapitupulucxr2) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
