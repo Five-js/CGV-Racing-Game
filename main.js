@@ -23,19 +23,21 @@ class Game {
     }
   
     init() {
-      // TODO: finish road circuit
-      // TODO: load screen
+      // TODO: refractor code
+      // TODO: switch between cameras automatically
+      // TODO: add next level button on gameMenu
+      // TODO: pause button
+      // TODO: add sound
+      // TODO: add physics
+      // TODO: light effects: shadows, reflection, sun(point light), etc...
+      // TODO: fix timer bug
+      // TODO: finesse load screen
+      // TODO: make timer start after load
+      // TODO: locked cars
 
-      // loadingscreen
-      let load = document.getElementById('loading');
-      load.style.display = 'block';
-
-      // cannon uses this
-      this.useVisuals = true;
-      this.y = -40;
-
+      this.setUpGlobalVariables();
+      // in game menu
       this.setUpGameMenu();
-      this.scene = new THREE.Scene();
       // visuals set up: shadows, viewport, antialias, etc...
       this.setUpVisuals();
       // camera set up
@@ -46,28 +48,42 @@ class Game {
       this.setUpControls();
       // the world
       this.createWorld();
+
       // physics
       // this.setUpPhysics();
 
+      // handle screen load
+      this.screenLoad();
+      // animate scene
+      this.animate();
+    }
+
+    setUpGlobalVariables(){
+      this.scene = new THREE.Scene();
+
+      // for loading screen
+      this.load = document.getElementById('loading');
+      this.load.style.display = 'block';
+
+      this._previousRAF = null;
       this._thirdPersonCamera = null;
       this._controls = null;
-      this.loadModels();
 
-  
-      
-      // animate scene
-      this._previousRAF = null;
+      // for cannon
+      this.useVisuals = true;
+
+      this.y = -40;
+    }
+
+    screenLoad(){
       setInterval(function(){
         let go = document.getElementById('h1');
         go.innerHTML = 'GO!!!';
         setInterval(function(){
-          load.style.display = 'none';
+          this.load.style.display = 'none';
         },2000);
       },10000);
-      this.animate();
     }
-
-
 
     stopGame(){
       numberOfLaps = 0;
@@ -291,23 +307,33 @@ class Game {
       hasWon = false;
       this.init();
     }
-  
 
-    loadModels() {
-
-      const loader = new GLTFLoader();
-
-      // Optional: Provide a DRACOLoader instance to decode compressed mesh data
+    setUpLoader(){
+      let loader = new GLTFLoader();
       const dracoLoader = new DRACOLoader();
       dracoLoader.setDecoderPath( './draco_decoder.js' );
       loader.setDRACOLoader( dracoLoader );
+      return loader;
+    }
+  
+    loadModels() {
+      // objects and constants to be used
+      const loader = this.setUpLoader();
       let scene = this.scene;
       let y = this.y;
 
+      // loading and placing the objects
       this.drawBuildings(y, scene);
-      this.drawCar(loader, y, scene, this._thirdPersonCamera, this._controls);
+      this.drawCar(y, scene);
       this.drawStartLine(loader, y, scene);
+      this.placeTrees();
+      this.drawRoads(loader, y, scene);
+      this.drawCross(loader, y, scene);
+      this.drawBarriers(loader, y, scene);
 
+    }
+
+    placeTrees(){
       // first one
       this.drawTrees(loader, y, scene, 0, 50);
 
@@ -320,16 +346,10 @@ class Game {
       // 4th
       this.drawTrees(loader, y, scene, -420, 730);
 
-      // strip
+      // line strip at end
       this.drawTrees(loader, y, scene, 0, 950);
       this.drawTrees(loader, y, scene, -160, 950);
-
-      this.drawRoads(loader, y, scene);
-      this.drawCross(loader, y, scene);
-      this.drawBarriers(loader, y, scene);
-
     }
-
     
     drawBuildings(y, scene){
       const building = './resources/buildingTxt/buldingTexture.png';
@@ -427,21 +447,6 @@ class Game {
       main.position.y = 8;
       car.add(main);
 
-      const carFrontTexture = this.getFrontTexture();
-      carFrontTexture.center= new THREE.Vector2(0.5, 0.5);
-      carFrontTexture.rotation = Math.PI/2;
-
-      const carBackTexture = this.getFrontTexture();
-      carBackTexture.center= new THREE.Vector2(0.5, 0.5);
-     carBackTexture.rotation = Math.PI/2;
-
-      const carRightSideTexture = this.getCarSideTexture();
-
-      const carLeftSideTexture = this.getCarSideTexture();
-      carLeftSideTexture.flipY = false;
-
-
-
       const geometry = new THREE.BoxGeometry(40, 12, 32);
       const material = new THREE.MeshBasicMaterial( { color: colorCabin } );
       let cabin = new THREE.Mesh( geometry, material );
@@ -456,45 +461,10 @@ class Game {
 
       return car;
 
-  }
-
-  getFrontTexture(){
-      const canvas = document.createElement("canvas");
-      canvas.width=64;
-      canvas.height=32;
-      const context = canvas.getContext("2d");
-
-      context.fillStyle="#ffffff";
-      context.fillRect(0, 0, 64, 32);
-
-      context.fillStyle="#666666";
-      context.fillRect(8, 8, 48, 24);
-
-      return new THREE.CanvasTexture(canvas);
+    }
 
 
-  }
-
-  getCarSideTexture(){
-      const canvas = document.createElement("canvas");
-      canvas.width=128;
-      canvas.height=32;
-      const context = canvas.getContext("2d");
-
-      context.fillStyle="#ffffff";
-      context.fillRect(0, 0, 128, 32);
-
-      context.fillStyle="#666666";
-      context.fillRect(10, 8, 38, 24);
-      context.fillRect(58, 8, 60, 24);
-
-      return new THREE.CanvasTexture(canvas);
-
-
-  }
-  
-
-    drawCar(loader, y, scene, cam, cntrl){
+    drawCar(y, scene){
       let mesh = null;
       if(car1Or2==1){
         mesh = this.Car(car1, car1Cabin);
@@ -1732,16 +1702,7 @@ class Game {
     createWorld(){
       this.skybox();
       this.ground();
-
-      // sphere
-      const sphereGeo = new THREE.SphereGeometry(0.5, 32, 32);
-      const sphereMaterial = new THREE.MeshPhongMaterial({
-        color: 0xdd88aa
-      });
-      const sphereMesh = new THREE.Mesh(sphereGeo, sphereMaterial);
-      sphereMesh.castShadow = true;
-      this.sphereMesh = sphereMesh;
-      // this.scene.add( this.sphereMesh );
+      this.loadModels();
     }
 
     updatePhysics(){
