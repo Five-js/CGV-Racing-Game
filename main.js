@@ -34,6 +34,7 @@ class Game {
       // TODO: finesse load screen
       // TODO: make timer start after load
       // TODO: locked cars
+      // TODO: mouse controls
 
       this.setUpGlobalVariables();
       // in game menu
