@@ -7,6 +7,8 @@
  * @param {CANNON.World} world
  * @param {object} [options]
  */
+import * as THREE from './three.js';
+
 THREE.CannonDebugRenderer = function(scene, world, options){
     options = options || {};
 

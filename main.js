@@ -1,20 +1,30 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
-// import * as THREE2 from "./libs/three.js";
-import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js';
+import * as THREE2 from "./libs/three.js";
+
+// loaders
 import {GLTFLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/DRACOLoader.js';
 
+// controls
+import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js';
+import {BasicCharacterController} from './BasicCharacterController.js';
+import {ThirdPersonCamera} from './ThirdPersonCamera.js';
+
+// physics
+import * as CANNON from './libs/cannon.js';
+import {CannonHelper} from './CannonHelper.js';
+
 let isPlaying = false;
-let hasWon = false;
-let hasLost = false;
-let numberOfLaps = 0;
+let isThirdPerson = true;
 let _APP = null;
+const time = 10000;
+
+// car related
 let car1 = 0x0000ff;
 let car1Cabin = 0x000000;
 let car2 = 0xff0000;
 let car2Cabin = 0x333333;
 let car1Or2 = 2;
-
 
 class Game {
     constructor() {
@@ -23,8 +33,7 @@ class Game {
     }
   
     init() {
-      // TODO: refractor code
-      // TODO: switch between cameras automatically
+      // TODO: add button to switch between cameras automatically
       // TODO: add next level button on gameMenu
       // TODO: pause button
       // TODO: add sound
@@ -33,8 +42,11 @@ class Game {
       // TODO: fix timer bug
       // TODO: finesse load screen
       // TODO: make timer start after load
-      // TODO: locked cars
+      // TODO: test stop game, pause and restart
       // TODO: mouse controls
+
+      // extras
+      // TODO: locked cars
 
       this.setUpGlobalVariables();
       // in game menu
@@ -74,6 +86,10 @@ class Game {
       this.useVisuals = true;
 
       this.y = -40;
+
+      this.hasWon = false;
+      this.hasLost = false;
+      this.numberOfLaps = 0;
     }
 
     screenLoad(){
@@ -81,27 +97,28 @@ class Game {
         let go = document.getElementById('h1');
         go.innerHTML = 'GO!!!';
         setInterval(function(){
+          this.load = document.getElementById('loading');
           this.load.style.display = 'none';
         },2000);
       },10000);
     }
 
     stopGame(){
-      numberOfLaps = 0;
+      this.numberOfLaps = 0;
       document.body.removeChild(this.renderer.domElement);
       isPlaying = false;
       gameMenu.innerHTML = '';
       let overlay = document.getElementById("overlay");
       overlay.innerHTML = '';
       overlay.style.display = 'none';
-      hasWon = false;
+      this.hasWon = false;
       let menu = document.getElementById("menu");
       menu.style.display = 'block';
       handleState();
     }
 
     setUpGameMenu(){
-      this.counter = 30;
+      this.counter = time;
       this.startTime = new Date();
       this.currentLapStart = this.startTime;
       let gameMenu = document.getElementById('gameMenu');
@@ -111,7 +128,7 @@ class Game {
       timer.id = "timer";
 
       let laps = document.createElement('p');
-      laps.innerHTML = `Laps: ${numberOfLaps}/3`;
+      laps.innerHTML = `Laps: ${this.numberOfLaps}/3`;
       laps.id = "laps";
 
       stopBtn.innerHTML = 'Stop Game';
@@ -129,31 +146,15 @@ class Game {
       gameMenu.appendChild(laps);
     }
 
-    animate(){
-
+    playInThirdPerson(){
       const game = this;
-      // requestAnimationFrame((t) => {
-      //   if (this._previousRAF === null) {
-      //     this._previousRAF = t;
-      //   }
 
-      //   game.animate()
-      //   // this.updatePhysics();
-      //   this.renderer.render(this.scene, this.camera);
-
-      //   // this.step(t - this._previousRAF);
-      //   this._previousRAF = t;
-
-      //   // this.updateTimer();
-
-      // });
-      
-      if(hasLost){
-        numberOfLaps = 3;
+      if(this.hasLost){
+        this.numberOfLaps = 3;
       }
-      if(numberOfLaps == 3){
-        if(hasLost){
-          hasLost = false;
+      if(this.numberOfLaps == 3){
+        if(this.hasLost){
+          this.hasLost = false;
           this.handleWinOrLoss(false);
         }
         else{
@@ -161,10 +162,10 @@ class Game {
         }
       }
 
-      if(numberOfLaps > 3){
+      if(this.numberOfLaps > 3){
         console.log("error");
       }
-      if(numberOfLaps < 3){
+      if(this.numberOfLaps < 3){
         requestAnimationFrame((t) => {
           if (this._previousRAF === null) {
             this._previousRAF = t;
@@ -181,7 +182,34 @@ class Game {
   
         });
       }
+    }
 
+    useWorldCamera(){
+      const game = this;
+
+      requestAnimationFrame((t) => {
+        if (this._previousRAF === null) {
+          this._previousRAF = t;
+        }
+
+        game.animate()
+        // this.updatePhysics();
+        this.renderer.render(this.scene, this.camera);
+
+        this._previousRAF = t;
+
+      });
+    }
+
+    animate(){
+
+      if(isThirdPerson){
+        this.playInThirdPerson();
+      }
+      else{
+        this.useWorldCamera();
+      }
+      
     }
 
     handleWinOrLoss(isWin){
@@ -232,7 +260,7 @@ class Game {
       let seconds = Math.round(timeDiff);
 
       let hasLapped = 0;
-      if(hasWon){
+      if(this.hasWon){
 
         // check if player really laped
         let diff = endTime - this.currentLapStart; //in ms
@@ -250,7 +278,7 @@ class Game {
       if(seconds >= 1){
         let timeLeft = this.counter - seconds;
         if(timeLeft<=0){
-          hasLost = true;
+          this.hasLost = true;
           timeLeft = 0;
         }
         let timer = document.getElementById('timer');
@@ -259,27 +287,27 @@ class Game {
         }
       }
 
-      if(hasLapped > 10 && numberOfLaps >= 1 && hasWon){
-        hasWon = false;
-        numberOfLaps = numberOfLaps + 1;
+      if(hasLapped > 10 && this.numberOfLaps >= 1 && this.hasWon){
+        this.hasWon = false;
+        this.numberOfLaps = this.numberOfLaps + 1;
         this.currentLapStart = new Date();
         let laps = document.getElementById('laps');
         if(laps){
-          laps.innerHTML = `Laps: ${numberOfLaps}/3`;
+          laps.innerHTML = `Laps: ${this.numberOfLaps}/3`;
         }
       }
 
-      if(hasLapped < 10 && numberOfLaps >= 1 && hasWon){
-        hasWon = false;
+      if(hasLapped < 10 && this.numberOfLaps >= 1 && this.hasWon){
+        this.hasWon = false;
       }
 
-      if(hasWon && numberOfLaps < 3){
-        hasWon = false;
-        numberOfLaps = numberOfLaps + 1;
+      if(this.hasWon && this.numberOfLaps < 3){
+        this.hasWon = false;
+        this.numberOfLaps = this.numberOfLaps + 1;
         this.currentLapStart = new Date();
         let laps = document.getElementById('laps');
         if(laps){
-          laps.innerHTML = `Laps: ${numberOfLaps}/3`;
+          laps.innerHTML = `Laps: ${this.numberOfLaps}/3`;
         }
       }
     }
@@ -288,14 +316,14 @@ class Game {
       const timeElapsedS = timeElapsed * 0.001;
   
       if (this._controls) {
-        this._controls.Update(timeElapsedS);
+        this._controls.Update(timeElapsedS, this.hasWon);
       }
   
       this._thirdPersonCamera.Update(timeElapsedS);
     }
 
     restart(){
-      numberOfLaps = 0;
+      this.numberOfLaps = 0;
       // Hide the overlay
       var overlay = document.getElementById("overlay");
       overlay.innerHTML = '';
@@ -305,7 +333,7 @@ class Game {
       document.body.removeChild(this.renderer.domElement);
       let gameMenu = document.getElementById('gameMenu');
       gameMenu.innerHTML = '';
-      hasWon = false;
+      this.hasWon = false;
       this.init();
     }
 
@@ -324,13 +352,13 @@ class Game {
       let y = this.y;
 
       // loading and placing the objects
-      this.drawBuildings(y, scene);
+      // this.drawBuildings(y, scene);
       this.drawCar(y, scene);
       this.drawStartLine(loader, y, scene);
-      this.placeTrees();
+      // this.placeTrees();
       this.drawRoads(loader, y, scene);
-      this.drawCross(loader, y, scene);
-      this.drawBarriers(loader, y, scene);
+      // this.drawCross(loader, y, scene);
+      // this.drawBarriers(loader, y, scene);
 
     }
 
@@ -477,18 +505,22 @@ class Game {
       mesh.position.set(5,y-8.5,-50);
       mesh.scale.set(0.15,0.15,0.15);
 
-      const params = {
-        camera: this.camera,
-        scene: this. scene,
-        target: mesh,
+      if(isThirdPerson){
+        const params = {
+          camera: this.camera,
+          scene: this. scene,
+          target: mesh,
+        }
+        this._controls = new BasicCharacterController(params);
+          
+        this._thirdPersonCamera = new ThirdPersonCamera({
+          camera: this.camera,
+          target: this._controls,
+        });
       }
-      this._controls = new BasicCharacterController(params);
-        
-      this._thirdPersonCamera = new ThirdPersonCamera({
-        camera: this.camera,
-        target: this._controls,
-      });
+      
       scene.add(mesh);
+
       // let camera = this.camera;
       // const car = './resources/car/scene.gltf';
       //   loader.load(
@@ -1735,7 +1767,7 @@ class Game {
     setUpPhysics(){
       if (this.useVisuals){
         this.helper = new CannonHelper(this.scene);
-        this.helper.addLights(this.renderer);
+        // this.helper.addLights(this.renderer);
       }
 
       this.initPhysics();
@@ -1749,7 +1781,7 @@ class Game {
       
       world.broadphase = new CANNON.NaiveBroadphase();
       world.gravity.set(0, -10, 0);
-      // this.debugRenderer = new THREE2.CannonDebugRenderer(this.scene, this.world);
+      this.debugRenderer = new THREE2.CannonDebugRenderer(this.scene, this.world);
 
       const groundShape = new CANNON.Plane();
       this.groundMaterial = new CANNON.Material();
@@ -1817,477 +1849,6 @@ class Game {
       this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
     
-}
-
-class BasicCharacterController {
-  constructor(params) {
-    this._Init(params);
-  }
-
-  _Init(params) {
-    this._params = params;
-    this._target = this._params.target;
-    this._decceleration = new THREE.Vector3(-0.0005, -0.0001, -5.0);
-    this._acceleration = new THREE.Vector3(1, 0.1, 200.0);
-    this._velocity = new THREE.Vector3(0, 0, 0);
-    this._position = new THREE.Vector3();
-
-    this._input = new BasicCharacterControllerInput();
-
-  }
-
-  get Position() {
-    return this._position;
-  }
-
-  get Rotation() {
-    if (!this._target) {
-      return new THREE.Quaternion();
-    }
-    return this._target.quaternion;
-  }
-
-  Update(timeInSeconds) {
-
-    const velocity = this._velocity;
-    const frameDecceleration = new THREE.Vector3(
-        velocity.x * this._decceleration.x,
-        velocity.y * this._decceleration.y,
-        velocity.z * this._decceleration.z
-    );
-    frameDecceleration.multiplyScalar(timeInSeconds);
-    frameDecceleration.z = Math.sign(frameDecceleration.z) * Math.min(
-        Math.abs(frameDecceleration.z), Math.abs(velocity.z));
-
-    velocity.add(frameDecceleration);
-
-    // const controlObject = this._target;
-    const _Q = new THREE.Quaternion();
-    const _A = new THREE.Vector3();
-    const _R = this._target.quaternion.clone();
-
-    const acc = this._acceleration.clone();
-    if (this._input._keys.shift) {
-      acc.multiplyScalar(2.0);
-    }
-
-    if (this._input._keys.forward) {
-      velocity.z += acc.z * timeInSeconds;
-    }
-    if (this._input._keys.backward) {
-      velocity.z -= acc.z * timeInSeconds;
-    }
-    if (this._input._keys.left) {
-      _A.set(0, 1, 0);
-      _Q.setFromAxisAngle(_A, 4.0 * Math.PI * timeInSeconds * this._acceleration.y);
-      _R.multiply(_Q);
-    }
-    if (this._input._keys.right) {
-      _A.set(0, 1, 0);
-      _Q.setFromAxisAngle(_A, 4.0 * -Math.PI * timeInSeconds * this._acceleration.y);
-      _R.multiply(_Q);
-    }
-
-    this._target.quaternion.copy(_R);
-
-    const oldPosition = new THREE.Vector3();
-    oldPosition.copy(this._target.position);
-
-    const forward = new THREE.Vector3(0, 0, 1);
-    forward.applyQuaternion(this._target.quaternion);
-    forward.normalize();
-
-    const sideways = new THREE.Vector3(1, 0, 0);
-    sideways.applyQuaternion(this._target.quaternion);
-    sideways.normalize();
-
-    sideways.multiplyScalar(velocity.x * timeInSeconds);
-    forward.multiplyScalar(velocity.z * timeInSeconds);
-
-    this._target.position.add(forward);
-    this._target.position.add(sideways);
-
-    this._position.copy(this._target.position);
-
-    if(this._target.position.x <= 55 && this._target.position.x >= -50 && this._target.position.z < -56 && this._target.position.z > -58){
-      hasWon = true;
-    }
-    
-
-  }
-
-}
-
-class BasicCharacterControllerInput {
-  constructor() {
-    this._Init();    
-  }
-
-  _Init() {
-    this._keys = {
-      forward: false,
-      backward: false,
-      left: false,
-      right: false,
-      space: false,
-      shift: false,
-    };
-    document.addEventListener('keydown', (e) => this._onKeyDown(e), false);
-    document.addEventListener('keyup', (e) => this._onKeyUp(e), false);
-  }
-
-  _onKeyDown(event) {
-    switch (event.keyCode) {
-      case 87: // w
-        this._keys.forward = true;
-        break;
-      case 65: // a
-        this._keys.left = true;
-        break;
-      case 83: // s
-        this._keys.backward = true;
-        break;
-      case 68: // d
-        this._keys.right = true;
-        break;
-      case 32: // SPACE
-        this._keys.space = true;
-        break;
-      case 16: // SHIFT
-        this._keys.shift = true;
-        break;
-    }
-  }
-
-  _onKeyUp(event) {
-    switch(event.keyCode) {
-      case 87: // w
-        this._keys.forward = false;
-        break;
-      case 65: // a
-        this._keys.left = false;
-        break;
-      case 83: // s
-        this._keys.backward = false;
-        break;
-      case 68: // d
-        this._keys.right = false;
-        break;
-      case 32: // SPACE
-        this._keys.space = false;
-        break;
-      case 16: // SHIFT
-        this._keys.shift = false;
-        break;
-    }
-  }
-};
-
-class ThirdPersonCamera {
-  constructor(params) {
-    this._params = params;
-    this._camera = params.camera;
-
-    this._currentPosition = new THREE.Vector3();
-    this._currentLookat = new THREE.Vector3();
-  }
-
-  _CalculateIdealOffset() {
-    const idealOffset = new THREE.Vector3(0, 20, -40);
-    idealOffset.applyQuaternion(this._params.target.Rotation);
-    idealOffset.add(this._params.target.Position);
-    return idealOffset;
-  }
-
-  _CalculateIdealLookat() {
-    const idealLookat = new THREE.Vector3(0, 10, 50);
-    idealLookat.applyQuaternion(this._params.target.Rotation);
-    idealLookat.add(this._params.target.Position);
-    return idealLookat;
-  }
-
-  Update(timeElapsed) {
-    const idealOffset = this._CalculateIdealOffset();
-    const idealLookat = this._CalculateIdealLookat();
-
-    // const t = 0.05;
-    // const t = 4.0 * timeElapsed;
-    const t = 1.0 - Math.pow(0.001, timeElapsed);
-
-    this._currentPosition.lerp(idealOffset, t);
-    this._currentLookat.lerp(idealLookat, t);
-
-    this._camera.position.copy(this._currentPosition);
-    this._camera.lookAt(this._currentLookat);
-  }
-}
-
-
-class CannonHelper{
-  constructor(scene){
-      this.scene = scene;
-  }
-  
-  addLights(renderer){
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
-
-      // LIGHTS
-      const ambient = new THREE.AmbientLight( 0x888888 );
-      this.scene.add( ambient );
-
-      const light = new THREE.DirectionalLight( 0xdddddd );
-      light.position.set( 3, 10, 4 );
-      light.target.position.set( 0, 0, 0 );
-
-      light.castShadow = true;
-
-      const lightSize = 10;
-      light.shadow.camera.near = 1;
-      light.shadow.camera.far = 50;
-      light.shadow.camera.left = light.shadow.camera.bottom = -lightSize;
-      light.shadow.camera.right = light.shadow.camera.top = lightSize;
-
-      light.shadow.mapSize.width = 1024;
-      light.shadow.mapSize.height = 1024;
-
-      this.sun = light;
-      this.scene.add(light);    
-  }
-  
-  createCannonTrimesh(geometry){
-  if (!geometry.isBufferGeometry) return null;
-  
-  const posAttr = geometry.attributes.position;
-  const vertices = geometry.attributes.position.array;
-  let indices = [];
-  for(let i=0; i<posAttr.count; i++){
-    indices.push(i);
-  }
-  
-  return new CANNON.Trimesh(vertices, indices);
-}
-
-createCannonConvex(geometry){
-  if (!geometry.isBufferGeometry) return null;
-  
-  const posAttr = geometry.attributes.position;
-  const floats = geometry.attributes.position.array;
-  const vertices = [];
-  const faces = [];
-  let face = [];
-  let index = 0;
-  for(let i=0; i<posAttr.count; i+=3){
-    vertices.push( new CANNON.Vec3(floats[i], floats[i+1], floats[i+2]) );
-    face.push(index++);
-    if (face.length==3){
-      faces.push(face);
-      face = [];
-    }
-  }
-  
-  return new CANNON.ConvexPolyhedron(vertices, faces);
-}
-  
-  addVisual(body, name, castShadow=true, receiveShadow=true){
-  body.name = name;
-  const textureLoader = new THREE.TextureLoader();
-  const grass = new THREE.MeshBasicMaterial({
-    map: textureLoader.load('./resources/grass.jpg'),
-  });
-  this.currentMaterial = grass;
-  if (this.currentMaterial===undefined) this.currentMaterial = new THREE.MeshLambertMaterial({color:0x088888});
-  if (this.settings===undefined){
-    this.settings = {
-      stepFrequency: 60,
-      quatNormalizeSkip: 2,
-      quatNormalizeFast: true,
-      gx: 0,
-      gy: 0,
-      gz: 0,
-      iterations: 3,
-      tolerance: 0.0001,
-      k: 1e6,
-      d: 3,
-      scene: 0,
-      paused: false,
-      rendermode: "solid",
-      constraints: false,
-      contacts: false,  // Contact points
-      cm2contact: false, // center of mass to contact points
-      normals: false, // contact normals
-      axes: false, // "local" frame axes
-      particleSize: 0.1,
-      shadows: false,
-      aabbs: false,
-      profiling: false,
-      maxSubSteps:3
-    }
-    this.particleGeo = new THREE.SphereGeometry( 1, 16, 8 );
-    this.particleMaterial = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
-  }
-  // What geometry should be used?
-  let mesh;
-  if(body instanceof CANNON.Body) mesh = this.shape2Mesh(body, castShadow, receiveShadow);
-
-  if(mesh) {
-    // Add body
-    body.threemesh = mesh;
-          mesh.castShadow = castShadow;
-          mesh.receiveShadow = receiveShadow;
-    this.scene.add(mesh);
-  }
-}
-
-shape2Mesh(body, castShadow, receiveShadow){
-  const obj = new THREE.Object3D();
-  const material = this.currentMaterial;
-  const game = this;
-  let index = 0;
-  
-  body.shapes.forEach (function(shape){
-    let mesh;
-    let geometry;
-    let v0, v1, v2;
-
-    switch(shape.type){
-
-    case CANNON.Shape.types.SPHERE:
-      const sphere_geometry = new THREE.SphereGeometry( shape.radius, 8, 8);
-      mesh = new THREE.Mesh( sphere_geometry, material );
-      break;
-
-    case CANNON.Shape.types.PARTICLE:
-      mesh = new THREE.Mesh( game.particleGeo, game.particleMaterial );
-      const s = this.settings;
-      mesh.scale.set(s.particleSize,s.particleSize,s.particleSize);
-      break;
-
-    case CANNON.Shape.types.PLANE:
-      geometry = new THREE.PlaneGeometry(10, 10, 4, 4);
-      mesh = new THREE.Object3D();
-      const submesh = new THREE.Object3D();
-      const ground = new THREE.Mesh( geometry, material );
-      ground.scale.set(100, 100, 100);
-      submesh.add(ground);
-
-      mesh.add(submesh);
-      break;
-
-    case CANNON.Shape.types.BOX:
-      const box_geometry = new THREE.BoxGeometry(  shape.halfExtents.x*2,
-                            shape.halfExtents.y*2,
-                            shape.halfExtents.z*2 );
-      mesh = new THREE.Mesh( box_geometry, material );
-      break;
-
-    case CANNON.Shape.types.CONVEXPOLYHEDRON:
-      const geo = new THREE.Geometry();
-
-      // Add vertices
-      shape.vertices.forEach(function(v){
-        geo.vertices.push(new THREE.Vector3(v.x, v.y, v.z));
-      });
-
-      shape.faces.forEach(function(face){
-        // add triangles
-        const a = face[0];
-        for (let j = 1; j < face.length - 1; j++) {
-          const b = face[j];
-          const c = face[j + 1];
-          geo.faces.push(new THREE.Face3(a, b, c));
-        }
-      });
-      geo.computeBoundingSphere();
-      geo.computeFaceNormals();
-      mesh = new THREE.Mesh( geo, material );
-      break;
-
-    case CANNON.Shape.types.HEIGHTFIELD:
-      geometry = new THREE.Geometry();
-
-      v0 = new CANNON.Vec3();
-      v1 = new CANNON.Vec3();
-      v2 = new CANNON.Vec3();
-      for (let xi = 0; xi < shape.data.length - 1; xi++) {
-        for (let yi = 0; yi < shape.data[xi].length - 1; yi++) {
-          for (let k = 0; k < 2; k++) {
-            shape.getConvexTrianglePillar(xi, yi, k===0);
-            v0.copy(shape.pillarConvex.vertices[0]);
-            v1.copy(shape.pillarConvex.vertices[1]);
-            v2.copy(shape.pillarConvex.vertices[2]);
-            v0.vadd(shape.pillarOffset, v0);
-            v1.vadd(shape.pillarOffset, v1);
-            v2.vadd(shape.pillarOffset, v2);
-            geometry.vertices.push(
-              new THREE.Vector3(v0.x, v0.y, v0.z),
-              new THREE.Vector3(v1.x, v1.y, v1.z),
-              new THREE.Vector3(v2.x, v2.y, v2.z)
-            );
-            var i = geometry.vertices.length - 3;
-            geometry.faces.push(new THREE.Face3(i, i+1, i+2));
-          }
-        }
-      }
-      geometry.computeBoundingSphere();
-      geometry.computeFaceNormals();
-      mesh = new THREE.Mesh(geometry, material);
-      break;
-
-    case CANNON.Shape.types.TRIMESH:
-      geometry = new THREE.Geometry();
-
-      v0 = new CANNON.Vec3();
-      v1 = new CANNON.Vec3();
-      v2 = new CANNON.Vec3();
-      for (let i = 0; i < shape.indices.length / 3; i++) {
-        shape.getTriangleVertices(i, v0, v1, v2);
-        geometry.vertices.push(
-          new THREE.Vector3(v0.x, v0.y, v0.z),
-          new THREE.Vector3(v1.x, v1.y, v1.z),
-          new THREE.Vector3(v2.x, v2.y, v2.z)
-        );
-        var j = geometry.vertices.length - 3;
-        geometry.faces.push(new THREE.Face3(j, j+1, j+2));
-      }
-      geometry.computeBoundingSphere();
-      geometry.computeFaceNormals();
-      mesh = new THREE.Mesh(geometry, MutationRecordaterial);
-      break;
-
-    default:
-      throw "Visual type not recognized: "+shape.type;
-    }
-
-    mesh.receiveShadow = receiveShadow;
-    mesh.castShadow = castShadow;
-          
-          mesh.traverse( function(child){
-              if (child.isMesh){
-                  child.castShadow = castShadow;
-        child.receiveShadow = receiveShadow;
-              }
-          });
-
-    var o = body.shapeOffsets[index];
-    var q = body.shapeOrientations[index++];
-    mesh.position.set(o.x, o.y, o.z);
-    mesh.quaternion.set(q.x, q.y, q.z, q.w);
-
-    obj.add(mesh);
-  });
-
-  return obj;
-}
-  
-  updateBodies(world){
-      world.bodies.forEach( function(body){
-          if ( body.threemesh != undefined){
-              body.threemesh.position.copy(body.position);
-              body.threemesh.quaternion.copy(body.quaternion);
-          }
-      });
-  }
 }
 
 
