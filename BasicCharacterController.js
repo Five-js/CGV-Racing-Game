@@ -106,12 +106,54 @@ export class BasicCharacterController {
     }
 
     checkBounds(){
+      let isInBounds = false;
       let x = this._target.position.x;
-      if(x >= 30 || x <= -20){
-        return false;
+      let z = this._target.position.z;
+
+      // order in reverse
+      // rotated is x
+
+      // first stretch
+      if(x < 30 && x > -20 && z > -350 && z < 535){
+        isInBounds = true;
       }
 
-      return true;
+      // second road
+      else if(x < 30 && x > -380 && z > 480 && z < 570){
+        isInBounds = true;
+      }
+
+      // third road
+      else if(x < -320 && x > -380 && z > 260 && z < 570){
+        isInBounds = true;
+      }
+
+      // fourth road
+      else if(x < -320 && x > -690 && z > 260 && z < 310){
+        isInBounds = true;
+      }
+
+      // 5th road
+      else if(x < -640 && x > -690 && z > -110 && z < 310){
+        isInBounds = true;
+      }
+
+      // 6th road
+      else if(x < -433 && x > -690 && z > -110 && z < -60){
+        isInBounds = true;
+      }
+
+      // 7th (shortest) road
+      else if(x < -425 && x > -468 && z > -280 && z < -60){
+        isInBounds = true;
+      }
+
+      // before last corner
+      else if(x < 30 && x > -468 && z > -285 && z < -230){
+        isInBounds = true;
+      }
+
+      return isInBounds;
     }
   
   }

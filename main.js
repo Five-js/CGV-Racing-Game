@@ -32,13 +32,13 @@ class Game {
     }
   
     init() {
+      // TODO: uncomment load models
       // TODO: add button to switch between cameras automatically
-      // TODO: fix timer bug
+      // TODO: fix timer bug then run whole circuit once
       // TODO: add next level button on gameMenu
       // TODO: add sound
-      // TODO: add physics
       // TODO: light effects: shadows, reflection, sun(point light), etc...
-      // TODO: mouse controls
+
 
       // handle screen loading
       this.screenLoad('Loading...', 10000);
@@ -559,7 +559,7 @@ class Game {
         carMesh = this.Car(car2,car2Cabin);
       }
 
-      carMesh.position.set(5,y-8.5,-50);
+      carMesh.position.set(-400,y-8.5,-250);
       carMesh.scale.set(0.15,0.15,0.15);
 
       if(isThirdPerson){
