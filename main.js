@@ -1,5 +1,4 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
-import * as THREE2 from "./libs/three.js";
 
 // loaders
 import {GLTFLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/GLTFLoader.js';
@@ -9,10 +8,9 @@ import { DRACOLoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples
 import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js';
 import {BasicCharacterController} from './BasicCharacterController.js';
 import {ThirdPersonCamera} from './ThirdPersonCamera.js';
+import {JoyStick} from './JoyStick.js';
 
 // physics
-import * as CANNON from './libs/cannon.js';
-import {CannonHelper} from './CannonHelper.js';
 
 let isPlaying = false;
 let isThirdPerson = true;
@@ -59,11 +57,13 @@ class Game {
       this.setUpLights();
       // controls
       this.setUpControls();
-      // the world
-      this.createWorld();
+      
 
       // physics
       // this.setUpPhysics();
+
+      // the world
+      this.createWorld();
 
       // handle screen load
       this.screenLoad();
@@ -171,8 +171,7 @@ class Game {
             this._previousRAF = t;
           }
   
-          game.animate()
-          // this.updatePhysics();
+          game.animate();
           this.renderer.render(this.scene, this.camera);
   
           this.step(t - this._previousRAF);
@@ -181,6 +180,10 @@ class Game {
           this.updateTimer();
   
         });
+        
+        // this.updatePhysics();
+        // this.updateDrive();
+
       }
     }
 
@@ -192,7 +195,7 @@ class Game {
           this._previousRAF = t;
         }
 
-        game.animate()
+        game.animate();
         // this.updatePhysics();
         this.renderer.render(this.scene, this.camera);
 
@@ -201,6 +204,7 @@ class Game {
       });
     }
 
+    
     animate(){
 
       if(isThirdPerson){
@@ -494,22 +498,23 @@ class Game {
 
 
     drawCar(y, scene){
-      let mesh = null;
+      // test with wall
+      let carMesh = null;
       if(car1Or2==1){
-        mesh = this.Car(car1, car1Cabin);
+        carMesh = this.Car(car1, car1Cabin);
       }
       else{
-        mesh = this.Car(car2,car2Cabin);
+        carMesh = this.Car(car2,car2Cabin);
       }
 
-      mesh.position.set(5,y-8.5,-50);
-      mesh.scale.set(0.15,0.15,0.15);
+      carMesh.position.set(5,y-8.5,-50);
+      carMesh.scale.set(0.15,0.15,0.15);
 
       if(isThirdPerson){
         const params = {
           camera: this.camera,
-          scene: this. scene,
-          target: mesh,
+          scene: this.scene,
+          target: carMesh,
         }
         this._controls = new BasicCharacterController(params);
           
@@ -519,49 +524,9 @@ class Game {
         });
       }
       
-      scene.add(mesh);
+      this.carMesh = carMesh;
+      scene.add(this.carMesh);
 
-      // let camera = this.camera;
-      // const car = './resources/car/scene.gltf';
-      //   loader.load(
-      //     // resource URL
-      //     car,
-      //     // called when the resource is loaded
-      //     function ( gltf ) {
-    
-      //       let mesh = gltf.scene;
-      //       mesh.position.set(5,y-8,-50);
-      //       mesh.scale.set(0.03,0.03,0.03);
-      //       mesh.rotation.set(0, Math.PI, 0);
-
-      //       const params = {
-      //         camera,
-      //         scene,
-      //         target: mesh,
-      //       }
-      //       cntrl = new BasicCharacterController(params);
-        
-      //       cam = new ThirdPersonCamera({
-      //         camera,
-      //         target: cntrl,
-      //       });
-    
-      //       scene.add( mesh );
-    
-      //     },
-      //     // called while loading is progressing
-      //     function ( xhr ) {
-    
-      //       console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-    
-      //     },
-      //     // called when loading has errors
-      //     function ( error ) {
-    
-      //       console.log( error );
-    
-      //     }
-      //   );
     }
 
     drawBarriers(loader, y, scene){
@@ -1738,17 +1703,17 @@ class Game {
       this.loadModels();
     }
 
-    updatePhysics(){
-      this.world.step(this.fixedTimeStep);
-      this.groundMesh.position.copy(this.groundBody.position);
-      this.sphereMesh.position.copy(this.sphereBody.position);
-    }
-
     setUpControls(){
       const controls = new OrbitControls(
       this.camera, this.renderer.domElement);
       controls.target.set(0, 20, 0);
       controls.update();
+
+      // this.joystick = new JoyStick({
+      //   game:this,
+      //   onMove:this.joystickCallback
+      // });
+      // this.js = { forward:0, turn:0 };
     }
 
     setUpCamera(){
@@ -1764,48 +1729,138 @@ class Game {
       // this.camera.lookAt(new THREE.Vector3(-200, 0, 0));
     }
 
-    setUpPhysics(){
-      if (this.useVisuals){
-        this.helper = new CannonHelper(this.scene);
-        // this.helper.addLights(this.renderer);
-      }
+    updatePhysics(){
+      this.world.step(this.fixedTimeStep);
+      this.groundMesh.position.copy(this.groundRigidBody.position);
+      this.groundMesh.quaternion.copy(this.groundRigidBody.quaternion);
+      // this.carMesh.position.copy(this.carRigidBody.position);
+      // this.carMesh.quaternion.copy(this.carRigidBody.quaternion);
+    }
 
-      this.initPhysics();
+    setUpPhysics(){
+      if(isThirdPerson){
+        // if (this.useVisuals){
+        //   this.helper = new CannonHelper(this.scene);
+        //   // this.helper.addLights(this.renderer);
+        // }
+  
+        this.initPhysics();
+      }
     }
 
     initPhysics(){
-      const world = new CANNON.World();
-      this.world = world;
+      this.setUpCannonWorld();
+
+      this.createGroundRigidBody();
+      this.world.addBody(this.groundRigidBody);
+
+      this.createCarRigidBody();
+      this.world.addBody(this.carRigidBody);
+
+      // Create contact material behaviour
+      const contact_ground_car = new CANNON.ContactMaterial(this.groundMaterial, this.carMaterial, 
+          {
+            friction: 0.3,
+            restitution: 0,
+            contactEquationStiffness: 1000
+          }
+        );
+      
+      this.world.addContactMaterial(contact_ground_car);
+      
+    }
+
+    createGroundRigidBody(){
+      const groundShape = new CANNON.Plane();
+      this.groundMaterial = new CANNON.Material();
+      this.groundRigidBody = new CANNON.Body({
+        mass: 0,
+        material: this.groundMaterial
+      });
+      this.groundRigidBody.addShape(groundShape);
+      this.groundRigidBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+      this.groundRigidBody.position.y = -50;
+    }
+
+    createCarRigidBody(){
+      const carShape = new CANNON.Box(6, 5.25, 9);
+      this.carMaterial = new CANNON.Material();
+      this.carRigidBody = new CANNON.Body({
+        mass: 990,
+        material: this.carMaterial
+      });
+      this.carRigidBody.addShape(carShape);
+      this.carRigidBody.position.set(5, this.y-8, -50);
+
+      // added
+      const vehicle = new CANNON.RaycastVehicle({
+        chassisBody: this.carRigidBody,
+        indexRightAxis: 0,
+        indexUpAxis: 1,
+        indeForwardAxis: 2
+      });
+
+      const options = this.getOptions();
+  
+      options.chassisConnectionPointLocal.set(1, 0, -1);
+      vehicle.addWheel(options);
+  
+      options.chassisConnectionPointLocal.set(-1, 0, -1);
+      vehicle.addWheel(options);
+  
+      options.chassisConnectionPointLocal.set(1, 0, 1);
+      vehicle.addWheel(options);
+  
+      options.chassisConnectionPointLocal.set(-1, 0, 1);
+      vehicle.addWheel(options);
+  
+      vehicle.addToWorld(this.world);
+
+      options.chassisConnectionPointLocal.set(1, 0, -1);
+      vehicle.addWheel(options);
+
+      options.chassisConnectionPointLocal.set(-1, 0, -1);
+      vehicle.addWheel(options);
+
+      options.chassisConnectionPointLocal.set(1, 0, 1);
+      vehicle.addWheel(options);
+
+      options.chassisConnectionPointLocal.set(-1, 0, 1);
+      vehicle.addWheel(options);
+
+      vehicle.addToWorld(this.world);
+
+      this.vehicle = vehicle;
+
+    }
+
+    getOptions(){
+      return {
+        radius: 0.5,
+        directionLocal: new CANNON.Vec3(0, -1, 0),
+        suspensionStiffness: 30,
+        suspensionRestLength: 0.3,
+        frictionSlip: 5,
+        dampingRelaxation: 2.3,
+        dampingCompression: 4.4,
+        maxSuspensionForce: 100000,
+        rollInfluence:  0.01,
+        axleLocal: new CANNON.Vec3(-1, 0, 0),
+        chassisConnectionPointLocal: new CANNON.Vec3(1, 1, 0),
+        maxSuspensionTravel: 0.3,
+        customSlidingRotationalSpeed: -30,
+        useCustomSlidingRotationalSpeed: true
+      };
+    }
+
+    setUpCannonWorld(){
+      this.world = new CANNON.World();
       this.fixedTimeStep = 1.0/60.0;
       this.damping = 0.01;
       
-      world.broadphase = new CANNON.NaiveBroadphase();
-      world.gravity.set(0, -10, 0);
-      this.debugRenderer = new THREE2.CannonDebugRenderer(this.scene, this.world);
-
-      const groundShape = new CANNON.Plane();
-      this.groundMaterial = new CANNON.Material();
-      this.groundBody = new CANNON.Body({
-        mass: 0
-      });
-      this.groundBody.addShape(groundShape);
-      this.groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
-      world.add(this.groundBody);
-
-      const sphereShape = new CANNON.Sphere(0.5);
-      this.sphereMaterial = new CANNON.Material();
-      this.sphereBody = new CANNON.Body({
-        mass: 5
-      });
-      this.sphereBody.addShape(sphereShape);
-      this.sphereBody.position.set(0, 20, 0);
-      world.add(this.sphereBody);
-
-      // Create contact material behaviour
-      const contact_ground_sphere = new CANNON.ContactMaterial(this.groundMaterial, this.sphereMaterial, { friction: 0.0, restitution: 1 });
-      
-      this.world.addContactMaterial(contact_ground_sphere);
-      
+      this.world.broadphase = new CANNON.NaiveBroadphase();
+      this.world.gravity.set(0, -10, 0);
+      // this.debugRenderer = new THREE2.CannonDebugRenderer(this.scene, this.world);
     }
 
     setUpLights(){
@@ -1847,6 +1902,39 @@ class Game {
       this.camera.aspect = window.innerWidth / window.innerHeight;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    updateDrive(forward=this.js.forward, turn=this.js.turn){
+		
+      const maxSteerVal = 0.5;
+          const maxForce = 100;
+          const brakeForce = 10;
+       
+      const force = maxForce * forward;
+      const steer = maxSteerVal * turn;
+       
+      if (forward!=0){
+        this.vehicle.setBrake(0, 0);
+        this.vehicle.setBrake(0, 1);
+        this.vehicle.setBrake(0, 2);
+        this.vehicle.setBrake(0, 3);
+  
+        this.vehicle.applyEngineForce(force, 2);
+        this.vehicle.applyEngineForce(force, 3);
+       }else{
+        this.vehicle.setBrake(brakeForce, 0);
+        this.vehicle.setBrake(brakeForce, 1);
+        this.vehicle.setBrake(brakeForce, 2);
+        this.vehicle.setBrake(brakeForce, 3);
+      }
+      
+      this.vehicle.setSteeringValue(steer, 0);
+      this.vehicle.setSteeringValue(steer, 1);
+    }
+
+    joystickCallback( forward, turn ){
+      this.js.forward = forward;
+      this.js.turn = -turn;
     }
     
 }

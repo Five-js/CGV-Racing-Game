@@ -46,7 +46,8 @@ export class BasicCharacterController {
       // const controlObject = this._target;
       const _Q = new THREE.Quaternion();
       const _A = new THREE.Vector3();
-      const _R = this._target.quaternion.clone();
+      let _R = new CANNON.Quaternion();
+      _R = _R.copy(this._target.quaternion.clone());
   
       const acc = this._acceleration.clone();
       if (this._input._keys.shift) {
@@ -62,12 +63,14 @@ export class BasicCharacterController {
       if (this._input._keys.left) {
         _A.set(0, 1, 0);
         _Q.setFromAxisAngle(_A, 4.0 * Math.PI * timeInSeconds * this._acceleration.y);
-        _R.multiply(_Q);
+        // _R.multiply(_Q);
+        _R = _R.mult(_Q);
       }
       if (this._input._keys.right) {
         _A.set(0, 1, 0);
         _Q.setFromAxisAngle(_A, 4.0 * -Math.PI * timeInSeconds * this._acceleration.y);
-        _R.multiply(_Q);
+        // _R.multiply(_Q);
+        _R = _R.mult(_Q);
       }
   
       this._target.quaternion.copy(_R);

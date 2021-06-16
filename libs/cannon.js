@@ -7707,7 +7707,10 @@ Box.prototype.volume = function(){
 };
 
 Box.prototype.updateBoundingSphereRadius = function(){
-    this.boundingSphereRadius = this.halfExtents.norm();
+    // this.boundingSphereRadius = this.halfExtents.norm();
+    this.boundingSphereRadius = Math.sqrt(
+        this.halfExtents[0]*this.halfExtents[0] + this.halfExtents[1]*this.halfExtents[1]
+    );
 };
 
 var worldCornerTempPos = new Vec3();
