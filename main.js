@@ -344,7 +344,7 @@ class Game {
       // this.drawBuildings(y, scene);
       this.drawCar(y, scene);
       this.drawStartLine(loader, y, scene);
-      // this.placeTrees(loader, y, scene);
+      this.placeTrees(loader, y, scene);
       this.drawRoads(loader, y, scene);
       // this.drawCross(loader, y, scene);
       // this.drawBarriers(loader, y, scene);
