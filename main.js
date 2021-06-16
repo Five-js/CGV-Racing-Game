@@ -8,14 +8,14 @@ import { DRACOLoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples
 import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js';
 import {BasicCharacterController} from './BasicCharacterController.js';
 import {ThirdPersonCamera} from './ThirdPersonCamera.js';
-import {JoyStick} from './JoyStick.js';
 
 // physics
 
 let isPlaying = false;
-let isThirdPerson = true;
+let isPaused = false;
+let isThirdPerson = false;
 let _APP = null;
-const time = 10000;
+const time = 192; //always add 12 seconds to time you want
 
 // car related
 let car1 = 0x0000ff;
@@ -32,20 +32,16 @@ class Game {
   
     init() {
       // TODO: add button to switch between cameras automatically
+      // TODO: fix timer bug
       // TODO: add next level button on gameMenu
-      // TODO: pause button
       // TODO: add sound
       // TODO: add physics
       // TODO: light effects: shadows, reflection, sun(point light), etc...
-      // TODO: fix timer bug
-      // TODO: finesse load screen
-      // TODO: make timer start after load
-      // TODO: test stop game, pause and restart
       // TODO: mouse controls
 
-      // extras
-      // TODO: locked cars
-
+      // handle screen loading
+      this.screenLoad();
+      // set up variables to be used
       this.setUpGlobalVariables();
       // in game menu
       this.setUpGameMenu();
@@ -57,16 +53,8 @@ class Game {
       this.setUpLights();
       // controls
       this.setUpControls();
-      
-
-      // physics
-      // this.setUpPhysics();
-
       // the world
       this.createWorld();
-
-      // handle screen load
-      this.screenLoad();
       // animate scene
       this.animate();
     }
@@ -74,9 +62,6 @@ class Game {
     setUpGlobalVariables(){
       this.scene = new THREE.Scene();
 
-      // for loading screen
-      this.load = document.getElementById('loading');
-      this.load.style.display = 'block';
 
       this._previousRAF = null;
       this._thirdPersonCamera = null;
@@ -93,13 +78,28 @@ class Game {
     }
 
     screenLoad(){
-      setInterval(function(){
+      // first half
+      this.load = document.getElementById('loading');
+      let gameMenu = document.getElementById('gameMenu');
+      gameMenu.style.display = 'none';
+      this.load.style.display = 'block';
+      let go = document.getElementById('h1');
+      go.innerHTML = 'loading...';
+      let soundIcons = document.getElementById('sound');
+      soundIcons.style.display = 'none';
+
+      // before game begins
+      setTimeout(function(){
         let go = document.getElementById('h1');
         go.innerHTML = 'GO!!!';
-        setInterval(function(){
+        setTimeout(function(){
           this.load = document.getElementById('loading');
           this.load.style.display = 'none';
-        },2000);
+          let gameMenu = document.getElementById('gameMenu');
+          gameMenu.style.display = 'block';
+          let soundIcons = document.getElementById('sound');
+          soundIcons.style.display = 'block';
+        },1000);
       },10000);
     }
 
@@ -107,6 +107,7 @@ class Game {
       this.numberOfLaps = 0;
       document.body.removeChild(this.renderer.domElement);
       isPlaying = false;
+      _APP = null;
       gameMenu.innerHTML = '';
       let overlay = document.getElementById("overlay");
       overlay.innerHTML = '';
@@ -117,12 +118,27 @@ class Game {
       handleState();
     }
 
+    pauseGame(){
+      isPaused = true;
+      console.log("paused");
+    }
+
+    restartGame(){
+      this.screenLoad();
+      this.carMesh.position.set(5,this.y-8.5,-50);
+      this.counter = time;
+      this.startTime = new Date();
+      this.currentLapStart = this.startTime;
+    }
+
     setUpGameMenu(){
       this.counter = time;
       this.startTime = new Date();
       this.currentLapStart = this.startTime;
       let gameMenu = document.getElementById('gameMenu');
       let stopBtn = document.createElement('Button');
+      let pauseBtn = document.createElement('Button');
+      let restartBtn = document.createElement('Button');
       let timer = document.createElement('p');
       timer.innerHTML = `Time left: ${this.counter}`;
       timer.id = "timer";
@@ -138,12 +154,32 @@ class Game {
         document.querySelector(".buttons").style.display = "flex";
         document.querySelector("#back_button").style.display = "none";
         document.querySelector(".race-container").style.display = "none";
-        document.querySelector(".in-game-race-container").style.display = "none";
 
       };
+
+      pauseBtn.innerHTML = 'Pause';
+      pauseBtn.onclick = (e) => {
+        if(!isPaused){
+          isPaused = true;
+          console.log("paused");
+          pauseBtn.innerHTML = "Play";
+        }
+        else{
+          isPaused = false;
+          pauseBtn.innerHTML = "Pause";
+        }
+      }
+
+      restartBtn.innerHTML = 'Restart';
+      restartBtn.onclick = (e) => {
+        this.restartGame();
+      }
+
       gameMenu.appendChild(stopBtn);
       gameMenu.appendChild(timer);
       gameMenu.appendChild(laps);
+      gameMenu.appendChild(pauseBtn);
+      gameMenu.appendChild(restartBtn);
     }
 
     playInThirdPerson(){
@@ -167,18 +203,24 @@ class Game {
       }
       if(this.numberOfLaps < 3){
         requestAnimationFrame((t) => {
-          if (this._previousRAF === null) {
-            this._previousRAF = t;
+          if(isPaused){
+            game.animate();
+            this.renderer.render(this.scene, this.camera);
           }
-  
-          game.animate();
-          this.renderer.render(this.scene, this.camera);
-  
-          this.step(t - this._previousRAF);
-          this._previousRAF = t;
-  
-          this.updateTimer();
-  
+          else{
+            if (this._previousRAF === null) {
+              this._previousRAF = t;
+            }
+    
+            game.animate();
+            this.renderer.render(this.scene, this.camera);
+    
+            this.step(t - this._previousRAF);
+            this._previousRAF = t;
+    
+            this.updateTimer();
+          }
+
         });
         
         // this.updatePhysics();
@@ -204,7 +246,6 @@ class Game {
       });
     }
 
-    
     animate(){
 
       if(isThirdPerson){
@@ -363,6 +404,7 @@ class Game {
       this.drawRoads(loader, y, scene);
       // this.drawCross(loader, y, scene);
       // this.drawBarriers(loader, y, scene);
+      console.log("100% loaded");
 
     }
 
@@ -549,7 +591,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -575,7 +617,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -603,7 +645,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -629,7 +671,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -657,7 +699,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -683,7 +725,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -711,7 +753,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -737,7 +779,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -765,7 +807,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -791,7 +833,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -819,7 +861,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -845,7 +887,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -873,7 +915,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -899,7 +941,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -927,7 +969,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -953,7 +995,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -1213,7 +1255,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -1241,7 +1283,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -1269,7 +1311,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -1296,7 +1338,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -1325,7 +1367,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -1354,7 +1396,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -1383,7 +1425,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -1412,7 +1454,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -1441,7 +1483,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -1655,7 +1697,7 @@ class Game {
         // called while loading is progressing
         function ( xhr ) {
 
-          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          1+1;
 
         },
         // called when loading has errors
@@ -1729,140 +1771,6 @@ class Game {
       // this.camera.lookAt(new THREE.Vector3(-200, 0, 0));
     }
 
-    updatePhysics(){
-      this.world.step(this.fixedTimeStep);
-      this.groundMesh.position.copy(this.groundRigidBody.position);
-      this.groundMesh.quaternion.copy(this.groundRigidBody.quaternion);
-      // this.carMesh.position.copy(this.carRigidBody.position);
-      // this.carMesh.quaternion.copy(this.carRigidBody.quaternion);
-    }
-
-    setUpPhysics(){
-      if(isThirdPerson){
-        // if (this.useVisuals){
-        //   this.helper = new CannonHelper(this.scene);
-        //   // this.helper.addLights(this.renderer);
-        // }
-  
-        this.initPhysics();
-      }
-    }
-
-    initPhysics(){
-      this.setUpCannonWorld();
-
-      this.createGroundRigidBody();
-      this.world.addBody(this.groundRigidBody);
-
-      this.createCarRigidBody();
-      this.world.addBody(this.carRigidBody);
-
-      // Create contact material behaviour
-      const contact_ground_car = new CANNON.ContactMaterial(this.groundMaterial, this.carMaterial, 
-          {
-            friction: 0.3,
-            restitution: 0,
-            contactEquationStiffness: 1000
-          }
-        );
-      
-      this.world.addContactMaterial(contact_ground_car);
-      
-    }
-
-    createGroundRigidBody(){
-      const groundShape = new CANNON.Plane();
-      this.groundMaterial = new CANNON.Material();
-      this.groundRigidBody = new CANNON.Body({
-        mass: 0,
-        material: this.groundMaterial
-      });
-      this.groundRigidBody.addShape(groundShape);
-      this.groundRigidBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
-      this.groundRigidBody.position.y = -50;
-    }
-
-    createCarRigidBody(){
-      const carShape = new CANNON.Box(6, 5.25, 9);
-      this.carMaterial = new CANNON.Material();
-      this.carRigidBody = new CANNON.Body({
-        mass: 990,
-        material: this.carMaterial
-      });
-      this.carRigidBody.addShape(carShape);
-      this.carRigidBody.position.set(5, this.y-8, -50);
-
-      // added
-      const vehicle = new CANNON.RaycastVehicle({
-        chassisBody: this.carRigidBody,
-        indexRightAxis: 0,
-        indexUpAxis: 1,
-        indeForwardAxis: 2
-      });
-
-      const options = this.getOptions();
-  
-      options.chassisConnectionPointLocal.set(1, 0, -1);
-      vehicle.addWheel(options);
-  
-      options.chassisConnectionPointLocal.set(-1, 0, -1);
-      vehicle.addWheel(options);
-  
-      options.chassisConnectionPointLocal.set(1, 0, 1);
-      vehicle.addWheel(options);
-  
-      options.chassisConnectionPointLocal.set(-1, 0, 1);
-      vehicle.addWheel(options);
-  
-      vehicle.addToWorld(this.world);
-
-      options.chassisConnectionPointLocal.set(1, 0, -1);
-      vehicle.addWheel(options);
-
-      options.chassisConnectionPointLocal.set(-1, 0, -1);
-      vehicle.addWheel(options);
-
-      options.chassisConnectionPointLocal.set(1, 0, 1);
-      vehicle.addWheel(options);
-
-      options.chassisConnectionPointLocal.set(-1, 0, 1);
-      vehicle.addWheel(options);
-
-      vehicle.addToWorld(this.world);
-
-      this.vehicle = vehicle;
-
-    }
-
-    getOptions(){
-      return {
-        radius: 0.5,
-        directionLocal: new CANNON.Vec3(0, -1, 0),
-        suspensionStiffness: 30,
-        suspensionRestLength: 0.3,
-        frictionSlip: 5,
-        dampingRelaxation: 2.3,
-        dampingCompression: 4.4,
-        maxSuspensionForce: 100000,
-        rollInfluence:  0.01,
-        axleLocal: new CANNON.Vec3(-1, 0, 0),
-        chassisConnectionPointLocal: new CANNON.Vec3(1, 1, 0),
-        maxSuspensionTravel: 0.3,
-        customSlidingRotationalSpeed: -30,
-        useCustomSlidingRotationalSpeed: true
-      };
-    }
-
-    setUpCannonWorld(){
-      this.world = new CANNON.World();
-      this.fixedTimeStep = 1.0/60.0;
-      this.damping = 0.01;
-      
-      this.world.broadphase = new CANNON.NaiveBroadphase();
-      this.world.gravity.set(0, -10, 0);
-      // this.debugRenderer = new THREE2.CannonDebugRenderer(this.scene, this.world);
-    }
-
     setUpLights(){
       let light = new THREE.DirectionalLight(0xFFFFFF, 1.0);
       light.position.set(20, 100, 10);
@@ -1902,39 +1810,6 @@ class Game {
       this.camera.aspect = window.innerWidth / window.innerHeight;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-
-    updateDrive(forward=this.js.forward, turn=this.js.turn){
-		
-      const maxSteerVal = 0.5;
-          const maxForce = 100;
-          const brakeForce = 10;
-       
-      const force = maxForce * forward;
-      const steer = maxSteerVal * turn;
-       
-      if (forward!=0){
-        this.vehicle.setBrake(0, 0);
-        this.vehicle.setBrake(0, 1);
-        this.vehicle.setBrake(0, 2);
-        this.vehicle.setBrake(0, 3);
-  
-        this.vehicle.applyEngineForce(force, 2);
-        this.vehicle.applyEngineForce(force, 3);
-       }else{
-        this.vehicle.setBrake(brakeForce, 0);
-        this.vehicle.setBrake(brakeForce, 1);
-        this.vehicle.setBrake(brakeForce, 2);
-        this.vehicle.setBrake(brakeForce, 3);
-      }
-      
-      this.vehicle.setSteeringValue(steer, 0);
-      this.vehicle.setSteeringValue(steer, 1);
-    }
-
-    joystickCallback( forward, turn ){
-      this.js.forward = forward;
-      this.js.turn = -turn;
     }
     
 }
