@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>sensor-based-highspeed-race</title>
+		<meta name="viewport" content="width=device-width; initial-scale=1.0;" />
+		<link href="css/style.css" rel="stylesheet" type="text/css" />
+		<script src="js/three.min.js"></script>
+		<script src="js/ColladaLoader.js"></script>
+
+		<script src="js/BinaryLoader.js"></script>
+		<script src="js/Cars.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/stats.min.js"></script>
+
+		<script type="text/javascript" src="js/physi.js"></script>
+
+		<script type="text/javascript" src="js/speedometer/speedometer.js"></script>
+		<script type="text/javascript" src="js/speedometer/themes/default.js"></script>
+		<script type="text/javascript" src="js/speedometer/digitaldisplay.js"></script>
+		<script type="text/javascript" src="js/speedometer/example.js"></script>
+		<script type="text/javascript" src="js/speedometer/tbe.js"></script>
+		<script type="text/javascript" src="js/speedometer/xcanvas.js"></script>
+		<script type="text/javascript" src="js/TargetCamera.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+
+		<script type="text/javascript" src="js/jquery.js"></script>
+		
+		<script type="text/javascript" src="js/sounds.js"></script>	
+		<script type="text/javascript" src="js/game.js"></script>
+		<script type="text/javascript" src="js/timer.js"></script>
+		<script type="text/javascript" src="js/track.js"></script>
+		<script type="text/javascript" src="js/radar.js"></script>
+		
+		<script type="text/javascript" src="js/deviceController.js"></script>
+
+		<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+	<script type="text/javascript">
+	var sound1 = new Sound( [ 'sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3'], 275, .1 );
+	sound1.play();
+	$( document ).ready(function() {
+		$("#game").children().hide();
+		$( ".start" ).click(function() {
+			initScene($('input[name=gender]:checked', '#selectCar').val(), $('input[name=gender]:checked', '#selectTrack').val());
+			$("#startpage").hide();
+			$("#game").children().show();
+			$("#result").hide();
+			$("#hurt").hide();
+		});
+	});
+	</script>
+ 	</head>
+	<body>
+	<div id="startpage">
+		<div class="container">
+			<div class="content">
+				<img id ="logo" src="images/racing-logo.png">
+			</div>
+			<div class="menu">
+				<ul>
+					<li class="start"><a>Start Game</a></li>
+				</ul>
+				
+			</div>
+		</div>
+		<div class="cars">
+			<p class="general-heading">Choose your car:</p>
+			<div class="center-content">
+				<form id="selectCar">
+					<ul>
+						<li>
+							<a>Bugatti Veyron</a>
+							<div class="round-button">
+								<div class="round-button-circle"> 
+									<img class="size" src="images/veyron.gif">
+								</div>
+							</div>
+							<div class="radio">
+								<input id="veyron" type="radio" id="veyron" name="gender" value="veyron">
+								<label for="veyron"></label>
+							</div>
+						</li>
+						<li>
+							<a>Lamborghini Gallardo</a>
+							<div class="round-button">
+								<div class="round-button-circle"> 
+									<img class="size" src="images/gallardo.gif">
+								</div>
+							</div>
+							<div class="radio">
+								<input id="gallardo" type="radio" id="gallardo" name="gender" value="gallardo">
+								<label for="gallardo"></label>
+							</div>
+						</li>
+						<li>
+							<a>Ford Mustang</a>
+							<div class="round-button">
+								<div class="round-button-circle"> 
+									<img class="size" src="images/mustang.gif">
+								</div>
+							</div>
+							<div class="radio">
+								<input id="mustang" type="radio" id="mustang" name="gender" value="mustang" checked>
+								<label for="mustang"></label>
+							</div>
+						</li>
+					</ul>
+				</form>
+			</div>
+		</div>
+			
+		<div class="speedways">
+			<p class="general-heading">Choose your speedway:</p>
+			<div class="center-content">
+				<form id="selectTrack">
+					<ul>
+						<li>
+							<a>Mountain Valley Raceway</a>
+							<div class="round-button">
+								<div class="round-button-circle"> 
+									<img  src="images/MountainTrack-top.jpg">
+								</div>
+							</div>
+							<div class="radio">
+								<input id="mountain-track" type="radio" name="gender" value="Mountain" checked>
+								<label for="mountain-track"></label>
+							</div>
+						</li>
+					</ul>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div id="game">
+		<div id="hurt"></div>
+		<div id="result">
+			<div class="win">!!YOU WIN!! Your time:
+				<div class="time"></div>
+			</div>
+			<div class="crash">You destroyed your car. Try again!</div>
+			<a class="restart button gray" href="#">Restart</a>
+		</div>
+		<div id="timer">00:00:000</div>
+		<div id="tacho">
+			<div id="speedometer"></div>
+			<div id="tachometer"></div>
+		</div>
+		<div id="viewport">
+			<div id="tracking-overlay">
+				<img src="images/MountainTrack.png">
+				<div class="tracking-ball"></div>
+			</div>
+		</div>
+		<div id="damage"></div>
+	</div>
+	</body>
+</html>
