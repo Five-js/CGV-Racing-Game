@@ -13,8 +13,9 @@ import {ThirdPersonCamera} from './ThirdPersonCamera.js';
 
 let isPlaying = false;
 let isPaused = false;
-let isThirdPerson = false;
+let isThirdPerson = true;
 let _APP = null;
+let canMove = false;
 const time = 192; //always add 12 seconds to time you want
 
 // car related
@@ -40,7 +41,7 @@ class Game {
       // TODO: mouse controls
 
       // handle screen loading
-      this.screenLoad();
+      this.screenLoad('Loading...', 10000);
       // set up variables to be used
       this.setUpGlobalVariables();
       // in game menu
@@ -73,18 +74,19 @@ class Game {
       this.y = -40;
 
       this.hasWon = false;
+      this.isInBounds = true;
       this.hasLost = false;
       this.numberOfLaps = 0;
     }
 
-    screenLoad(){
+    screenLoad(loading, time){
       // first half
       this.load = document.getElementById('loading');
       let gameMenu = document.getElementById('gameMenu');
       gameMenu.style.display = 'none';
       this.load.style.display = 'block';
       let go = document.getElementById('h1');
-      go.innerHTML = 'loading...';
+      go.innerHTML = loading;
       let soundIcons = document.getElementById('sound');
       soundIcons.style.display = 'none';
 
@@ -99,8 +101,9 @@ class Game {
           gameMenu.style.display = 'block';
           let soundIcons = document.getElementById('sound');
           soundIcons.style.display = 'block';
+          canMove = true;
         },1000);
-      },10000);
+      },time);
     }
 
     stopGame(){
@@ -124,7 +127,8 @@ class Game {
     }
 
     restartGame(){
-      this.screenLoad();
+      canMove = false;
+      this.screenLoad('Restarting Game, Please Wait..', 10000);
       this.carMesh.position.set(5,this.y-8.5,-50);
       this.counter = time;
       this.startTime = new Date();
@@ -218,13 +222,10 @@ class Game {
             this.step(t - this._previousRAF);
             this._previousRAF = t;
     
-            this.updateTimer();
+            // this.updateTimer();
           }
 
         });
-        
-        // this.updatePhysics();
-        // this.updateDrive();
 
       }
     }
@@ -360,8 +361,17 @@ class Game {
     step(timeElapsed) {
       const timeElapsedS = timeElapsed * 0.001;
   
-      if (this._controls) {
-        this._controls.Update(timeElapsedS, this.hasWon);
+      if (this._controls && canMove) {
+        this.isInBounds = this._controls.Update(timeElapsedS, this.hasWon);
+        // returns user to start if out of bounds
+        // console.log(this.isInBounds);
+        if(!this.isInBounds){
+          canMove = false;
+          this.isInBounds = true;
+          this.screenLoad("You were out of bounds, stay on the road!", 5000);
+          this.carMesh.position.set(5,this.y-8.5,-50);
+          this.carMesh.rotation.set(0,0,0);
+        }
       }
   
       this._thirdPersonCamera.Update(timeElapsedS);

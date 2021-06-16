@@ -93,12 +93,25 @@ export class BasicCharacterController {
       this._target.position.add(sideways);
   
       this._position.copy(this._target.position);
+
+      let isInBounds = this.checkBounds();
   
       if(this._target.position.x <= 55 && this._target.position.x >= -50 && this._target.position.z < -56 && this._target.position.z > -58){
         hasWon = true;
       }
+
+      return isInBounds;
       
   
+    }
+
+    checkBounds(){
+      let x = this._target.position.x;
+      if(x >= 30 || x <= -20){
+        return false;
+      }
+
+      return true;
     }
   
   }
