@@ -407,18 +407,18 @@ class Game {
       let y = this.y;
 
       // loading and placing the objects
-      // this.drawBuildings(y, scene);
+       this.drawBuildings(y, scene);
       this.drawCar(y, scene);
       this.drawStartLine(loader, y, scene);
-      // this.placeTrees();
+      this.placeTrees(loader,y,scene);
       this.drawRoads(loader, y, scene);
-      // this.drawCross(loader, y, scene);
-      // this.drawBarriers(loader, y, scene);
+      this.drawCross(loader, y, scene);
+      this.drawBarriers(loader, y, scene);
       console.log("100% loaded");
 
     }
 
-    placeTrees(){
+    placeTrees(loader, y, scene){
       // first one
       this.drawTrees(loader, y, scene, 0, 50);
 
@@ -1722,12 +1722,12 @@ class Game {
     skybox(){
       const loader = new THREE.CubeTextureLoader();
       const sky = loader.load([
-          './resources/humble_ft.jpg',
-          './resources/humble_bk.jpg',
-          './resources/humble_up.jpg',
-          './resources/humble_dn.jpg',
-          './resources/humble_rt.jpg',
-          './resources/humble_lf.jpg',
+          './resources/ocean_ft.jpg',
+          './resources/ocean_bk.jpg',
+          './resources/ocean_up.jpg',
+          './resources/ocean_dn.jpg',
+          './resources/ocean_rt.jpg',
+          './resources/ocean_lf.jpg',
       ]);
       this.scene.background = sky;
     }
@@ -1735,7 +1735,7 @@ class Game {
     ground(){
       const textureLoader = new THREE.TextureLoader();
       const grass = new THREE.MeshBasicMaterial({
-        map: textureLoader.load('./resources/grass.jpg'),
+        map: textureLoader.load('./resources/pave.jpg'),
       });
       const ground = new THREE.Mesh(
           new THREE.PlaneGeometry(5000, 5000, 10, 10),
