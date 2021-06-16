@@ -16,7 +16,7 @@ let isPaused = false;
 let isThirdPerson = true;
 let _APP = null;
 let canMove = false;
-const time = 192; //always add 12 seconds to time you want
+const time = 32; //always add 12 seconds to time you want
 
 // car related
 let car1 = 0x0000ff;
@@ -127,12 +127,31 @@ class Game {
     }
 
     restartGame(){
+      let overlay = document.getElementById('overlay');
+      overlay.style.display = 'none';
       canMove = false;
       this.screenLoad('Restarting Game, Please Wait..', 10000);
       this.carMesh.position.set(5,this.y-8.5,-50);
       this.counter = time;
       this.startTime = new Date();
       this.currentLapStart = this.startTime;
+    }
+
+    step(timeElapsed) {
+      const timeElapsedS = timeElapsed * 0.001;
+  
+      if (this._controls && canMove) {
+        this.isInBounds = this._controls.Update(timeElapsedS, this.hasWon);
+        if(!this.isInBounds){
+          canMove = false;
+          this.isInBounds = true;
+          this.screenLoad("You were out of bounds, stay on the road!", 5000);
+          this.carMesh.position.set(5,this.y-8.5,-50);
+          this.carMesh.rotation.set(0,0,0);
+        }
+      }
+  
+      this._thirdPersonCamera.Update(timeElapsedS);
     }
 
     setUpGameMenu(){
@@ -222,7 +241,7 @@ class Game {
             this.step(t - this._previousRAF);
             this._previousRAF = t;
     
-            // this.updateTimer();
+            this.updateTimer();
           }
 
         });
@@ -271,27 +290,6 @@ class Game {
       }
       overlay.appendChild(header);
 
-      let restartBtn = document.createElement('Button');
-      let stopBtn = document.createElement('Button');
-
-      if(isWin){
-        restartBtn.innerHTML = "Restart Game";
-      }
-      else{
-        restartBtn.innerHTML = "Try Again";
-      }
-      stopBtn.innerHTML = "Quit Game";
-
-      // remove overlay contents on restart or stop
-      restartBtn.onclick = () => {
-        this.restart();
-      };
-      stopBtn.onclick = () => {
-        this.stopGame();
-      }
-
-      overlay.appendChild(restartBtn);
-      overlay.appendChild(stopBtn);
       overlay.style.display = "block";
     }
 
@@ -305,22 +303,6 @@ class Game {
       // get seconds 
       let seconds = Math.round(timeDiff);
 
-      let hasLapped = 0;
-      if(this.hasWon){
-
-        // check if player really laped
-        let diff = endTime - this.currentLapStart; //in ms
-        // strip the ms
-        diff /= 1000;
-
-        // get seconds 
-        hasLapped = Math.round(diff);
-      }
-
-      if(seconds >= 120){
-        this.startTime = new Date();
-      }
-
       if(seconds >= 1){
         let timeLeft = this.counter - seconds;
         if(timeLeft<=0){
@@ -333,20 +315,6 @@ class Game {
         }
       }
 
-      if(hasLapped > 10 && this.numberOfLaps >= 1 && this.hasWon){
-        this.hasWon = false;
-        this.numberOfLaps = this.numberOfLaps + 1;
-        this.currentLapStart = new Date();
-        let laps = document.getElementById('laps');
-        if(laps){
-          laps.innerHTML = `Laps: ${this.numberOfLaps}/3`;
-        }
-      }
-
-      if(hasLapped < 10 && this.numberOfLaps >= 1 && this.hasWon){
-        this.hasWon = false;
-      }
-
       if(this.hasWon && this.numberOfLaps < 3){
         this.hasWon = false;
         this.numberOfLaps = this.numberOfLaps + 1;
@@ -356,40 +324,6 @@ class Game {
           laps.innerHTML = `Laps: ${this.numberOfLaps}/3`;
         }
       }
-    }
-
-    step(timeElapsed) {
-      const timeElapsedS = timeElapsed * 0.001;
-  
-      if (this._controls && canMove) {
-        this.isInBounds = this._controls.Update(timeElapsedS, this.hasWon);
-        // returns user to start if out of bounds
-        // console.log(this.isInBounds);
-        if(!this.isInBounds){
-          canMove = false;
-          this.isInBounds = true;
-          this.screenLoad("You were out of bounds, stay on the road!", 5000);
-          this.carMesh.position.set(5,this.y-8.5,-50);
-          this.carMesh.rotation.set(0,0,0);
-        }
-      }
-  
-      this._thirdPersonCamera.Update(timeElapsedS);
-    }
-
-    restart(){
-      this.numberOfLaps = 0;
-      // Hide the overlay
-      var overlay = document.getElementById("overlay");
-      overlay.innerHTML = '';
-      overlay.style.display = 'none';
-
-      // Reinitialize us
-      document.body.removeChild(this.renderer.domElement);
-      let gameMenu = document.getElementById('gameMenu');
-      gameMenu.innerHTML = '';
-      this.hasWon = false;
-      this.init();
     }
 
     setUpLoader(){
@@ -410,7 +344,7 @@ class Game {
       // this.drawBuildings(y, scene);
       this.drawCar(y, scene);
       this.drawStartLine(loader, y, scene);
-      // this.placeTrees();
+      // this.placeTrees(loader, y, scene);
       this.drawRoads(loader, y, scene);
       // this.drawCross(loader, y, scene);
       // this.drawBarriers(loader, y, scene);
@@ -418,7 +352,7 @@ class Game {
 
     }
 
-    placeTrees(){
+    placeTrees(loader, y, scene){
       // first one
       this.drawTrees(loader, y, scene, 0, 50);
 
@@ -559,7 +493,7 @@ class Game {
         carMesh = this.Car(car2,car2Cabin);
       }
 
-      carMesh.position.set(-400,y-8.5,-250);
+      carMesh.position.set(5,y-8.5,-50);
       carMesh.scale.set(0.15,0.15,0.15);
 
       if(isThirdPerson){
