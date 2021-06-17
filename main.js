@@ -13,7 +13,7 @@ import {ThirdPersonCamera} from './ThirdPersonCamera.js';
 
 let isPlaying = false;
 let isPaused = false;
-let isThirdPerson = true;
+let isThirdPerson = false;
 let _APP = null;
 let canMove = false;
 const time = 192; //always add 12 seconds to time you want
@@ -437,23 +437,28 @@ class Game {
     }
     
     drawBuildings(y, scene){
-      const building = './resources/buildingTxt/buldingTexture.png';
-      const building2 = './resources/buildingTxt/glassTxt.jpg';
-      const building3 = './resources/buildingTxt/simpleTxt.jpg';
-      const building4= './resources/buildingTxt/res.jpg';
+      const building = './resources/buildingTxt/b0.jpg';
+      const building2 = './resources/buildingTxt/b1.jpg';
+      const building3 = './resources/buildingTxt/b2.jpg';
+      const building4= './resources/buildingTxt/b3.jpg';
 
       // first one (middle)
       this.cluster(0, y, -50, building2, building, building3, building4, scene);
+      this.cluster(400, y, -50, building2, building, building3, building4, scene);
       // back alone
       this.cluster(-160, y, 0, building2, building, building3, building4, scene);
       // back most
       this.cluster(-320, y, 0, building2, building, building3, building4, scene);
       // second left most
       this.cluster(0, y, 110, building2, building, building3, building4, scene);
+      this.cluster(400, y, 110, building2, building, building3, building4, scene);
       // left most
       this.cluster(0, y, 270, building2, building, building3, building4, scene);
+      this.cluster(400, y, 270, building2, building, building3, building4, scene);
       // right most
       this.cluster(0, y, -210, building2, building, building3, building4, scene);
+      this.cluster(400, y, -210, building2, building, building3, building4, scene);
+      this.cluster(150, y, -610, building2, building, building3, building4, scene);
       
     }
 
@@ -1722,25 +1727,30 @@ class Game {
     skybox(){
       const loader = new THREE.CubeTextureLoader();
       const sky = loader.load([
-          './resources/ocean_ft.jpg',
-          './resources/ocean_bk.jpg',
-          './resources/ocean_up.jpg',
-          './resources/ocean_dn.jpg',
-          './resources/ocean_rt.jpg',
-          './resources/ocean_lf.jpg',
+          './resources/meadow_ft.png',
+          './resources/meadow_bk.png',
+          './resources/meadow_up.png',
+          './resources/meadow_dn.png',
+          './resources/meadow_rt.png',
+          './resources/meadow_lf.png',
       ]);
       this.scene.background = sky;
     }
 
-    ground(){
+    ground() {
       const textureLoader = new THREE.TextureLoader();
       const grass = new THREE.MeshBasicMaterial({
-        map: textureLoader.load('./resources/pave.jpg'),
+        map: textureLoader.load("./resources/grass.jpg", function (texture) {
+          texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+          texture.offset.set(0, 0);
+          texture.repeat.set(200, 200);
+        }),
       });
       const ground = new THREE.Mesh(
-          new THREE.PlaneGeometry(5000, 5000, 10, 10),
-          grass
-          );
+        new THREE.PlaneGeometry(5000, 5000, 10, 10),
+        grass
+      );
+  
       ground.castShadow = false;
       ground.receiveShadow = true;
       ground.position.y = -50;
