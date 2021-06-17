@@ -8,18 +8,15 @@ import { DRACOLoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples
 import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js';
 import {BasicCharacterController} from './BasicCharacterController.js';
 import {ThirdPersonCamera} from './ThirdPersonCamera.js';
-import {Vhugala} from './Vhugala.js';
-import {OT} from './OT.js';
-import {Tumi} from './Tumi.js';
+import {handleState} from './main.js';
 
 // physics
 
-let isPlaying = false;
-let isPaused = false;
-let isThirdPerson = false;
-let _APP = null;
-let canMove = false;
-const time = 32; //always add 12 seconds to time you want
+let isPlaying;
+let isPaused;
+let isThirdPerson;
+let canMove;
+let time; //always add 12 seconds to time you want
 
 // car related
 let car1 = 0x0000ff;
@@ -27,25 +24,18 @@ let car1Cabin = 0x000000;
 let car2 = 0xff0000;
 let car2Cabin = 0x333333;
 let car1Or2 = 2;
-let trackChosen = 1;
 
-class Game {
-    constructor() {
+export class Vhugala {
+    constructor(params) {
       // call initializing method
-      this.init();
+      this.init(params);
     }
   
-    init() {
-      // TODO: uncomment load models
-      // TODO: add button to switch between cameras automatically
-      // TODO: fix timer bug then run whole circuit once
-      // TODO: add next level button on gameMenu
-      // TODO: add sound
-      // TODO: light effects: shadows, reflection, sun(point light), etc...
+    init(params) {
 
-
+        this.handleParams(params);
       // handle screen loading
-      this.screenLoad('Loading...', 10000);
+      this.screenLoad('Loading...', 100);
       // set up variables to be used
       this.setUpGlobalVariables();
       // in game menu
@@ -62,6 +52,15 @@ class Game {
       this.createWorld();
       // animate scene
       this.animate();
+    }
+
+    handleParams(params){
+        isPlaying = params.isPlaying;
+        isPaused = params.isPaused;
+        isThirdPerson = params.isThirdPerson;
+        canMove = params.canMove;
+        time = params.time;
+        car1Or2 = params.car1Or2;
     }
 
     setUpGlobalVariables(){
@@ -114,7 +113,6 @@ class Game {
       this.numberOfLaps = 0;
       document.body.removeChild(this.renderer.domElement);
       isPlaying = false;
-      _APP = null;
       gameMenu.innerHTML = '';
       let overlay = document.getElementById("overlay");
       overlay.innerHTML = '';
@@ -345,13 +343,13 @@ class Game {
       let y = this.y;
 
       // loading and placing the objects
-      // this.drawBuildings(y, scene);
+    //  this.drawBuildings(y, scene);
       this.drawCar(y, scene);
       this.drawStartLine(loader, y, scene);
-      // this.placeTrees(loader, y, scene);
+    //   this.placeTrees(loader, y, scene);
       this.drawRoads(loader, y, scene);
-      // this.drawCross(loader, y, scene);
-      // this.drawBarriers(loader, y, scene);
+    //    this.drawCross(loader, y, scene);
+    //  this.drawBarriers(loader, y, scene);
       console.log("100% loaded");
 
     }
@@ -379,6 +377,11 @@ class Game {
       const building2 = './resources/buildingTxt/glassTxt.jpg';
       const building3 = './resources/buildingTxt/simpleTxt.jpg';
       const building4= './resources/buildingTxt/res.jpg';
+      const c = './resources/construction/one.jpg';
+      const c2 = './resources/construction/two.jpg';
+      const c3 = './resources/construction/three.jpg';
+      const c4 = './resources/construction/four.jpg';
+      const b = './resources/buildingTxt/n.jpg';
 
       // first one (middle)
       this.cluster(0, y, -50, building2, building, building3, building4, scene);
@@ -392,6 +395,9 @@ class Game {
       this.cluster(0, y, 270, building2, building, building3, building4, scene);
       // right most
       this.cluster(0, y, -210, building2, building, building3, building4, scene);
+      this.cluster(400, y, -210, c,c2, c3, c4, scene);
+      this.cluster(400, y, 50, b,b, b, b, scene);
+      this.cluster(300, y, 700, b,b, b, b, scene);
       
     }
 
@@ -1660,25 +1666,30 @@ class Game {
     skybox(){
       const loader = new THREE.CubeTextureLoader();
       const sky = loader.load([
-          './resources/humble_ft.jpg',
-          './resources/humble_bk.jpg',
-          './resources/humble_up.jpg',
-          './resources/humble_dn.jpg',
-          './resources/humble_rt.jpg',
-          './resources/humble_lf.jpg',
+          './resources/ocean_ft.jpg',
+          './resources/ocean_bk.jpg',
+          './resources/ocean_up.jpg',
+          './resources/ocean_dn.jpg',
+          './resources/ocean_rt.jpg',
+          './resources/ocean_lf.jpg',
       ]);
       this.scene.background = sky;
     }
 
-    ground(){
+    ground() {
       const textureLoader = new THREE.TextureLoader();
       const grass = new THREE.MeshBasicMaterial({
-        map: textureLoader.load('./resources/grass.jpg'),
+        map: textureLoader.load("./resources/pave.jpg", function (texture) {
+          texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+          texture.offset.set(0, 0);
+          texture.repeat.set(200, 200);
+        }),
       });
       const ground = new THREE.Mesh(
-          new THREE.PlaneGeometry(5000, 5000, 10, 10),
-          grass
-          );
+        new THREE.PlaneGeometry(5000, 5000, 10, 10),
+        grass
+      );
+  
       ground.castShadow = false;
       ground.receiveShadow = true;
       ground.position.y = -50;
@@ -1761,81 +1772,3 @@ class Game {
     }
     
 }
-
-
-const params = {
-  isPlaying,
-  isPaused,
-  isThirdPerson,
-  canMove,
-  time,
-  car1Or2,
-}
-
-
-export function handleState(isPlaying){
-  if(isPlaying){
-    if(trackChosen==1){
-      _APP = new Game();
-    }
-    else if(trackChosen==2){
-      _APP = new OT(params);
-    }
-    else if(trackChosen==3){
-      _APP = new Vhugala(params);
-    }
-    else if(trackChosen==4){
-      _APP = new Tumi(params);
-    }
-    // _APP = new Game();
-    // _APP = new Vhugala(params);
-    // _APP = new OT(params);
-    // _APP = new Tumi(params);
-  }
-  else if(!isPlaying){
-    let startBtn = document.getElementById("start_race_button");
-    let isCar1 = document.getElementById("car-1");
-    let isCar2 = document.getElementById("car-2");
-
-    isCar1.onclick = (e) => {
-      car1Or2 = 1;
-    }
-    isCar2.onclick = (e) => {
-      car1Or2 = 2;
-    }
-    startBtn.onclick = (e) => {
-      isPlaying = true;
-      let menu = document.getElementById("menu");
-      menu.style.display = 'none';
-      document.querySelector("#back_button").style.display = "none";
-      document.querySelector(".in-game-menu-container").style.display = "flex";
-      handleState(isPlaying);
-    };
-
-    setUpTrack();
-  }
-}
-
-function setUpTrack(){
-  let DeathCity = document.getElementById("track-1");
-  let OTArena = document.getElementById("track-2");
-  let TheVMCircuit = document.getElementById("track-3");
-  let DaTumingHills = document.getElementById("track-4");
-
-  DeathCity.onclick = (e) => {
-    trackChosen = 1;
-  }
-  OTArena.onclick = (e) => {
-    trackChosen = 2;
-  }
-  TheVMCircuit.onclick = (e) => {
-    trackChosen = 3;
-  }
-  DaTumingHills.onclick = (e) => {
-    trackChosen = 4;
-  }
-}
-
-window.addEventListener('DOMContentLoaded', () =>{
-    handleState(isPlaying);
-});

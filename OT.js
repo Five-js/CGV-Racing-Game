@@ -8,18 +8,15 @@ import { DRACOLoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples
 import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js';
 import {BasicCharacterController} from './BasicCharacterController.js';
 import {ThirdPersonCamera} from './ThirdPersonCamera.js';
-import {Vhugala} from './Vhugala.js';
-import {OT} from './OT.js';
-import {Tumi} from './Tumi.js';
+import {handleState} from './main.js';
 
 // physics
 
-let isPlaying = false;
-let isPaused = false;
-let isThirdPerson = false;
-let _APP = null;
-let canMove = false;
-const time = 32; //always add 12 seconds to time you want
+let isPlaying;
+let isPaused;
+let isThirdPerson;
+let canMove;
+let time; //always add 12 seconds to time you want
 
 // car related
 let car1 = 0x0000ff;
@@ -27,23 +24,16 @@ let car1Cabin = 0x000000;
 let car2 = 0xff0000;
 let car2Cabin = 0x333333;
 let car1Or2 = 2;
-let trackChosen = 1;
 
-class Game {
-    constructor() {
+export class OT {
+    constructor(params) {
       // call initializing method
-      this.init();
+      this.init(params);
     }
   
-    init() {
-      // TODO: uncomment load models
-      // TODO: add button to switch between cameras automatically
-      // TODO: fix timer bug then run whole circuit once
-      // TODO: add next level button on gameMenu
-      // TODO: add sound
-      // TODO: light effects: shadows, reflection, sun(point light), etc...
+    init(params) {
 
-
+      this.handleParams(params);
       // handle screen loading
       this.screenLoad('Loading...', 10000);
       // set up variables to be used
@@ -62,6 +52,15 @@ class Game {
       this.createWorld();
       // animate scene
       this.animate();
+    }
+
+    handleParams(params){
+        isPlaying = params.isPlaying;
+        isPaused = params.isPaused;
+        isThirdPerson = params.isThirdPerson;
+        canMove = params.canMove;
+        time = params.time;
+        car1Or2 = params.car1Or2;
     }
 
     setUpGlobalVariables(){
@@ -114,7 +113,6 @@ class Game {
       this.numberOfLaps = 0;
       document.body.removeChild(this.renderer.domElement);
       isPlaying = false;
-      _APP = null;
       gameMenu.innerHTML = '';
       let overlay = document.getElementById("overlay");
       overlay.innerHTML = '';
@@ -122,7 +120,7 @@ class Game {
       this.hasWon = false;
       let menu = document.getElementById("menu");
       menu.style.display = 'block';
-      handleState(isPlaying);
+      handleState();
     }
 
     pauseGame(){
@@ -131,31 +129,12 @@ class Game {
     }
 
     restartGame(){
-      let overlay = document.getElementById('overlay');
-      overlay.style.display = 'none';
       canMove = false;
       this.screenLoad('Restarting Game, Please Wait..', 10000);
       this.carMesh.position.set(5,this.y-8.5,-50);
       this.counter = time;
       this.startTime = new Date();
       this.currentLapStart = this.startTime;
-    }
-
-    step(timeElapsed) {
-      const timeElapsedS = timeElapsed * 0.001;
-  
-      if (this._controls && canMove) {
-        this.isInBounds = this._controls.Update(timeElapsedS, this.hasWon);
-        if(!this.isInBounds){
-          canMove = false;
-          this.isInBounds = true;
-          this.screenLoad("You were out of bounds, stay on the road!", 5000);
-          this.carMesh.position.set(5,this.y-8.5,-50);
-          this.carMesh.rotation.set(0,0,0);
-        }
-      }
-  
-      this._thirdPersonCamera.Update(timeElapsedS);
     }
 
     setUpGameMenu(){
@@ -245,7 +224,7 @@ class Game {
             this.step(t - this._previousRAF);
             this._previousRAF = t;
     
-            this.updateTimer();
+            // this.updateTimer();
           }
 
         });
@@ -294,6 +273,27 @@ class Game {
       }
       overlay.appendChild(header);
 
+      let restartBtn = document.createElement('Button');
+      let stopBtn = document.createElement('Button');
+
+      if(isWin){
+        restartBtn.innerHTML = "Restart Game";
+      }
+      else{
+        restartBtn.innerHTML = "Try Again";
+      }
+      stopBtn.innerHTML = "Quit Game";
+
+      // remove overlay contents on restart or stop
+      restartBtn.onclick = () => {
+        this.restart();
+      };
+      stopBtn.onclick = () => {
+        this.stopGame();
+      }
+
+      overlay.appendChild(restartBtn);
+      overlay.appendChild(stopBtn);
       overlay.style.display = "block";
     }
 
@@ -307,6 +307,22 @@ class Game {
       // get seconds 
       let seconds = Math.round(timeDiff);
 
+      let hasLapped = 0;
+      if(this.hasWon){
+
+        // check if player really laped
+        let diff = endTime - this.currentLapStart; //in ms
+        // strip the ms
+        diff /= 1000;
+
+        // get seconds 
+        hasLapped = Math.round(diff);
+      }
+
+      if(seconds >= 120){
+        this.startTime = new Date();
+      }
+
       if(seconds >= 1){
         let timeLeft = this.counter - seconds;
         if(timeLeft<=0){
@@ -319,6 +335,20 @@ class Game {
         }
       }
 
+      if(hasLapped > 10 && this.numberOfLaps >= 1 && this.hasWon){
+        this.hasWon = false;
+        this.numberOfLaps = this.numberOfLaps + 1;
+        this.currentLapStart = new Date();
+        let laps = document.getElementById('laps');
+        if(laps){
+          laps.innerHTML = `Laps: ${this.numberOfLaps}/3`;
+        }
+      }
+
+      if(hasLapped < 10 && this.numberOfLaps >= 1 && this.hasWon){
+        this.hasWon = false;
+      }
+
       if(this.hasWon && this.numberOfLaps < 3){
         this.hasWon = false;
         this.numberOfLaps = this.numberOfLaps + 1;
@@ -328,6 +358,40 @@ class Game {
           laps.innerHTML = `Laps: ${this.numberOfLaps}/3`;
         }
       }
+    }
+
+    step(timeElapsed) {
+      const timeElapsedS = timeElapsed * 0.001;
+  
+      if (this._controls && canMove) {
+        this.isInBounds = this._controls.Update(timeElapsedS, this.hasWon);
+        // returns user to start if out of bounds
+        // console.log(this.isInBounds);
+        if(!this.isInBounds){
+          canMove = false;
+          this.isInBounds = true;
+          this.screenLoad("You were out of bounds, stay on the road!", 5000);
+          this.carMesh.position.set(5,this.y-8.5,-50);
+          this.carMesh.rotation.set(0,0,0);
+        }
+      }
+  
+      this._thirdPersonCamera.Update(timeElapsedS);
+    }
+
+    restart(){
+      this.numberOfLaps = 0;
+      // Hide the overlay
+      var overlay = document.getElementById("overlay");
+      overlay.innerHTML = '';
+      overlay.style.display = 'none';
+
+      // Reinitialize us
+      document.body.removeChild(this.renderer.domElement);
+      let gameMenu = document.getElementById('gameMenu');
+      gameMenu.innerHTML = '';
+      this.hasWon = false;
+      this.init();
     }
 
     setUpLoader(){
@@ -345,13 +409,13 @@ class Game {
       let y = this.y;
 
       // loading and placing the objects
-      // this.drawBuildings(y, scene);
+    //    this.drawBuildings(y, scene);
       this.drawCar(y, scene);
       this.drawStartLine(loader, y, scene);
-      // this.placeTrees(loader, y, scene);
+    //   this.placeTrees(loader,y,scene);
       this.drawRoads(loader, y, scene);
-      // this.drawCross(loader, y, scene);
-      // this.drawBarriers(loader, y, scene);
+    //   this.drawCross(loader, y, scene);
+    //   this.drawBarriers(loader, y, scene);
       console.log("100% loaded");
 
     }
@@ -375,23 +439,28 @@ class Game {
     }
     
     drawBuildings(y, scene){
-      const building = './resources/buildingTxt/buldingTexture.png';
-      const building2 = './resources/buildingTxt/glassTxt.jpg';
-      const building3 = './resources/buildingTxt/simpleTxt.jpg';
-      const building4= './resources/buildingTxt/res.jpg';
+      const building = './resources/buildingTxt/b0.jpg';
+      const building2 = './resources/buildingTxt/b1.jpg';
+      const building3 = './resources/buildingTxt/b2.jpg';
+      const building4= './resources/buildingTxt/b3.jpg';
 
       // first one (middle)
       this.cluster(0, y, -50, building2, building, building3, building4, scene);
+      this.cluster(400, y, -50, building2, building, building3, building4, scene);
       // back alone
       this.cluster(-160, y, 0, building2, building, building3, building4, scene);
       // back most
       this.cluster(-320, y, 0, building2, building, building3, building4, scene);
       // second left most
       this.cluster(0, y, 110, building2, building, building3, building4, scene);
+      this.cluster(400, y, 110, building2, building, building3, building4, scene);
       // left most
       this.cluster(0, y, 270, building2, building, building3, building4, scene);
+      this.cluster(400, y, 270, building2, building, building3, building4, scene);
       // right most
       this.cluster(0, y, -210, building2, building, building3, building4, scene);
+      this.cluster(400, y, -210, building2, building, building3, building4, scene);
+      this.cluster(150, y, -610, building2, building, building3, building4, scene);
       
     }
 
@@ -497,7 +566,7 @@ class Game {
         carMesh = this.Car(car2,car2Cabin);
       }
 
-      carMesh.position.set(5,y-8.5,-50);
+      carMesh.position.set(-400,y-8.5,-250);
       carMesh.scale.set(0.15,0.15,0.15);
 
       if(isThirdPerson){
@@ -1660,25 +1729,30 @@ class Game {
     skybox(){
       const loader = new THREE.CubeTextureLoader();
       const sky = loader.load([
-          './resources/humble_ft.jpg',
-          './resources/humble_bk.jpg',
-          './resources/humble_up.jpg',
-          './resources/humble_dn.jpg',
-          './resources/humble_rt.jpg',
-          './resources/humble_lf.jpg',
+          './resources/meadow_ft.png',
+          './resources/meadow_bk.png',
+          './resources/meadow_up.png',
+          './resources/meadow_dn.png',
+          './resources/meadow_rt.png',
+          './resources/meadow_lf.png',
       ]);
       this.scene.background = sky;
     }
 
-    ground(){
+    ground() {
       const textureLoader = new THREE.TextureLoader();
       const grass = new THREE.MeshBasicMaterial({
-        map: textureLoader.load('./resources/grass.jpg'),
+        map: textureLoader.load("./resources/grass.jpg", function (texture) {
+          texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+          texture.offset.set(0, 0);
+          texture.repeat.set(200, 200);
+        }),
       });
       const ground = new THREE.Mesh(
-          new THREE.PlaneGeometry(5000, 5000, 10, 10),
-          grass
-          );
+        new THREE.PlaneGeometry(5000, 5000, 10, 10),
+        grass
+      );
+  
       ground.castShadow = false;
       ground.receiveShadow = true;
       ground.position.y = -50;
@@ -1761,81 +1835,3 @@ class Game {
     }
     
 }
-
-
-const params = {
-  isPlaying,
-  isPaused,
-  isThirdPerson,
-  canMove,
-  time,
-  car1Or2,
-}
-
-
-export function handleState(isPlaying){
-  if(isPlaying){
-    if(trackChosen==1){
-      _APP = new Game();
-    }
-    else if(trackChosen==2){
-      _APP = new OT(params);
-    }
-    else if(trackChosen==3){
-      _APP = new Vhugala(params);
-    }
-    else if(trackChosen==4){
-      _APP = new Tumi(params);
-    }
-    // _APP = new Game();
-    // _APP = new Vhugala(params);
-    // _APP = new OT(params);
-    // _APP = new Tumi(params);
-  }
-  else if(!isPlaying){
-    let startBtn = document.getElementById("start_race_button");
-    let isCar1 = document.getElementById("car-1");
-    let isCar2 = document.getElementById("car-2");
-
-    isCar1.onclick = (e) => {
-      car1Or2 = 1;
-    }
-    isCar2.onclick = (e) => {
-      car1Or2 = 2;
-    }
-    startBtn.onclick = (e) => {
-      isPlaying = true;
-      let menu = document.getElementById("menu");
-      menu.style.display = 'none';
-      document.querySelector("#back_button").style.display = "none";
-      document.querySelector(".in-game-menu-container").style.display = "flex";
-      handleState(isPlaying);
-    };
-
-    setUpTrack();
-  }
-}
-
-function setUpTrack(){
-  let DeathCity = document.getElementById("track-1");
-  let OTArena = document.getElementById("track-2");
-  let TheVMCircuit = document.getElementById("track-3");
-  let DaTumingHills = document.getElementById("track-4");
-
-  DeathCity.onclick = (e) => {
-    trackChosen = 1;
-  }
-  OTArena.onclick = (e) => {
-    trackChosen = 2;
-  }
-  TheVMCircuit.onclick = (e) => {
-    trackChosen = 3;
-  }
-  DaTumingHills.onclick = (e) => {
-    trackChosen = 4;
-  }
-}
-
-window.addEventListener('DOMContentLoaded', () =>{
-    handleState(isPlaying);
-});
