@@ -409,13 +409,13 @@ export class OT {
       let y = this.y;
 
       // loading and placing the objects
-    //    this.drawBuildings(y, scene);
+       this.drawBuildings(y, scene);
       this.drawCar(y, scene);
       this.drawStartLine(loader, y, scene);
-    //   this.placeTrees(loader,y,scene);
+      this.placeTrees(loader,y,scene);
       this.drawRoads(loader, y, scene);
-    //   this.drawCross(loader, y, scene);
-    //   this.drawBarriers(loader, y, scene);
+      this.drawCross(loader, y, scene);
+      this.drawBarriers(loader, y, scene);
       console.log("100% loaded");
 
     }

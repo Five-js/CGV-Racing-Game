@@ -275,13 +275,13 @@ export class Tumi {
     let scene = this.scene;
     let y = this.y;
 
-    // this.drawCity(loader, y, scene);
+    this.drawCity(loader, y, scene);
     this.drawCar(loader, y, scene, this._thirdPersonCamera, this._controls);
     this.drawStartLine(loader, y, scene);
-    // this.drawTrees(loader, y, scene);
+    this.drawTrees(loader, y, scene);
     this.drawRoads(loader, y, scene);
     this.drawCross(loader, y, scene);
-    // this.drawBarriers(loader, y, scene);
+    this.drawBarriers(loader, y, scene);
   }
 
   drawCity(loader, y, scene) {
