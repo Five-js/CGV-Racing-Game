@@ -409,6 +409,71 @@ export class OT {
       let y = this.y;
 
       // loading and placing the objects
+      loader.load('./resources/eiffel_tower/scene.gltf',
+      // called when the resource is loaded
+      function ( gltf ) {
+
+        scene.add( gltf.scene );
+        let mesh = gltf.scene;
+          mesh.position.set(-150,y-10,-150);
+          mesh.scale.set(15,18,15);
+          mesh.rotation.set(0,4* Math.PI/2, 0);
+          scene.add( mesh );
+
+
+        // gltf.animations; // Array<THREE.AnimationClip>
+        // gltf.scene; // THREE.Group
+        // gltf.scenes; // Array<THREE.Group>
+        // gltf.cameras; // Array<THREE.Camera>
+        // gltf.asset; // Object
+        
+
+      },
+      // called while loading is progressing
+      function ( xhr ) {
+
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+      },
+      // called when loading has errors
+      function ( error ) {
+
+        console.log( error );
+
+      })
+      loader.load('./resources/camp_nou_stadium/scene.gltf',
+      // called when the resource is loaded
+      function ( gltf ) {
+
+        scene.add( gltf.scene );
+        let mesh = gltf.scene;
+          mesh.position.set(150,y-10,-300);
+          mesh.scale.set(0.02,0.03,0.02);
+          mesh.rotation.set(0,3.8* Math.PI/2, 0);
+          scene.add( mesh );
+
+
+        // gltf.animations; // Array<THREE.AnimationClip>
+        // gltf.scene; // THREE.Group
+        // gltf.scenes; // Array<THREE.Group>
+        // gltf.cameras; // Array<THREE.Camera>
+        // gltf.asset; // Object
+        
+
+      },
+      // called while loading is progressing
+      function ( xhr ) {
+
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+      },
+      // called when loading has errors
+      function ( error ) {
+
+        console.log( error );
+
+      })
+      
        this.drawBuildings(y, scene);
       this.drawCar(y, scene);
       this.drawStartLine(loader, y, scene);
@@ -448,7 +513,7 @@ export class OT {
       this.cluster(0, y, -50, building2, building, building3, building4, scene);
       this.cluster(400, y, -50, building2, building, building3, building4, scene);
       // back alone
-      this.cluster(-160, y, 0, building2, building, building3, building4, scene);
+     this.cluster(-160, y, 0, building2, building, building3, building4, scene);
       // back most
       this.cluster(-320, y, 0, building2, building, building3, building4, scene);
       // second left most
@@ -458,7 +523,7 @@ export class OT {
       this.cluster(0, y, 270, building2, building, building3, building4, scene);
       this.cluster(400, y, 270, building2, building, building3, building4, scene);
       // right most
-      this.cluster(0, y, -210, building2, building, building3, building4, scene);
+      this.cluster(-110, y, -210, building2, building, building3, building4, scene);
       this.cluster(400, y, -210, building2, building, building3, building4, scene);
       this.cluster(150, y, -610, building2, building, building3, building4, scene);
       
