@@ -19,7 +19,7 @@ let isPaused = false;
 let isThirdPerson = false;
 let _APP = null;
 let canMove = false;
-const time = 32; //always add 12 seconds to time you want
+const time = 252; //always add 12 seconds to time you want
 
 // car related
 let car1 = 0x0000ff;
@@ -350,8 +350,8 @@ class Game {
       this.drawStartLine(loader, y, scene);
       // this.placeTrees(loader, y, scene);
       this.drawRoads(loader, y, scene);
-      // this.drawCross(loader, y, scene);
-      // this.drawBarriers(loader, y, scene);
+      this.drawCross(loader, y, scene);
+      this.drawBarriers(loader, y, scene);
       console.log("100% loaded");
 
     }
