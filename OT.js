@@ -409,6 +409,102 @@ export class OT {
       let y = this.y;
 
       // loading and placing the objects
+      loader.load('./resources/4_skyscraper/scene.gltf',
+      // called when the resource is loaded
+      function ( gltf ) {
+
+        scene.add( gltf.scene );
+        let mesh = gltf.scene;
+          mesh.position.set(-200,y-8,600);
+          mesh.scale.set(1,2,1);
+          mesh.rotation.set(0,2* Math.PI/2, 0);
+          scene.add( mesh );
+
+
+        // gltf.animations; // Array<THREE.AnimationClip>
+        // gltf.scene; // THREE.Group
+        // gltf.scenes; // Array<THREE.Group>
+        // gltf.cameras; // Array<THREE.Camera>
+        // gltf.asset; // Object
+        
+
+      },
+      // called while loading is progressing
+      function ( xhr ) {
+
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+      },
+      // called when loading has errors
+      function ( error ) {
+
+        console.log( error );
+
+      })
+      loader.load('./resources/food/scene.gltf',
+      // called when the resource is loaded
+      function ( gltf ) {
+
+        scene.add( gltf.scene );
+        let mesh = gltf.scene;
+          mesh.position.set(0,y-8,600);
+          mesh.scale.set(3,5,2);
+          mesh.rotation.set(0,2* Math.PI/2, 0);
+          scene.add( mesh );
+
+
+        // gltf.animations; // Array<THREE.AnimationClip>
+        // gltf.scene; // THREE.Group
+        // gltf.scenes; // Array<THREE.Group>
+        // gltf.cameras; // Array<THREE.Camera>
+        // gltf.asset; // Object
+        
+
+      },
+      // called while loading is progressing
+      function ( xhr ) {
+
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+      },
+      // called when loading has errors
+      function ( error ) {
+
+        console.log( error );
+
+      })
+      loader.load('./resources/truckshop_and_garage/scene.gltf',
+      // called when the resource is loaded
+      function ( gltf ) {
+
+        scene.add( gltf.scene );
+        let mesh = gltf.scene;
+          mesh.position.set(-300,y-10,-425);
+          mesh.scale.set(2.5,4.5,2.5);
+          mesh.rotation.set(0,4* Math.PI/2, 0);
+          scene.add( mesh );
+
+
+        // gltf.animations; // Array<THREE.AnimationClip>
+        // gltf.scene; // THREE.Group
+        // gltf.scenes; // Array<THREE.Group>
+        // gltf.cameras; // Array<THREE.Camera>
+        // gltf.asset; // Object
+        
+
+      },
+      // called while loading is progressing
+      function ( xhr ) {
+
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+      },
+      // called when loading has errors
+      function ( error ) {
+
+        console.log( error );
+
+      })
       loader.load('./resources/eiffel_tower/scene.gltf',
       // called when the resource is loaded
       function ( gltf ) {
