@@ -342,7 +342,114 @@ export class Vhugala {
       let scene = this.scene;
       let y = this.y;
 
+
+      loader.load('./resources/br/scene.gltf',
+      // called when the resource is loaded
+      function ( gltf ) {
+
+        scene.add( gltf.scene );
+        let mesh = gltf.scene;
+          mesh.position.set(0,y-8,300);
+          mesh.scale.set(2,2,1.5);
+          mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+
+        // gltf.animations; // Array<THREE.AnimationClip>
+        // gltf.scene; // THREE.Group
+        // gltf.scenes; // Array<THREE.Group>
+        // gltf.cameras; // Array<THREE.Camera>
+        // gltf.asset; // Object
+        
+
+      },
+      // called while loading is progressing
+      function ( xhr ) {
+
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+      },
+      // called when loading has errors
+      function ( error ) {
+
+        console.log( error );
+
+      })
+
+
+
+
+
+
       // loading and placing the objects
+      loader.load('./resources/car_scene/scene.gltf',
+      // called when the resource is loaded
+      function ( gltf ) {
+
+        scene.add( gltf.scene );
+        let mesh = gltf.scene;
+          mesh.position.set(100,y-8,500);
+          mesh.scale.set(0.1,0.1,0.2);
+          mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+
+        // gltf.animations; // Array<THREE.AnimationClip>
+        // gltf.scene; // THREE.Group
+        // gltf.scenes; // Array<THREE.Group>
+        // gltf.cameras; // Array<THREE.Camera>
+        // gltf.asset; // Object
+        
+
+      },
+      // called while loading is progressing
+      function ( xhr ) {
+
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+      },
+      // called when loading has errors
+      function ( error ) {
+
+        console.log( error );
+
+      })
+
+
+      //
+      loader.load('./resources/rusty/scene.gltf',
+      // called when the resource is loaded
+      function ( gltf ) {
+
+        scene.add( gltf.scene );
+        let mesh = gltf.scene;
+          mesh.position.set(-800,y-8,300);
+          mesh.scale.set(0.1,0.1,0.2);
+          mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+
+        // gltf.animations; // Array<THREE.AnimationClip>
+        // gltf.scene; // THREE.Group
+        // gltf.scenes; // Array<THREE.Group>
+        // gltf.cameras; // Array<THREE.Camera>
+        // gltf.asset; // Object
+        
+
+      },
+      // called while loading is progressing
+      function ( xhr ) {
+
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+      },
+      // called when loading has errors
+      function ( error ) {
+
+        console.log( error );
+
+      })
+      
      this.drawBuildings(y, scene);
       this.drawCar(y, scene);
       this.drawStartLine(loader, y, scene);
@@ -353,6 +460,11 @@ export class Vhugala {
       console.log("100% loaded");
 
     }
+
+
+
+
+    
 
     placeTrees(loader, y, scene){
       // first one
