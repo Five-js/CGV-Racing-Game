@@ -28,6 +28,7 @@ let car2 = 0xff0000;
 let car2Cabin = 0x333333;
 let car1Or2 = 2;
 let trackChosen = 1;
+let hasWon = false;
 
 class Game {
     constructor() {
@@ -39,8 +40,6 @@ class Game {
       // TODO: uncomment load models
       // TODO: add button to switch between cameras automatically
       // TODO: fix timer bug then run whole circuit once
-      // TODO: add next level button on gameMenu
-      // TODO: add sound
       // TODO: light effects: shadows, reflection, sun(point light), etc...
 
 
@@ -77,10 +76,10 @@ class Game {
 
       this.y = -40;
 
-      this.hasWon = false;
       this.isInBounds = true;
       this.hasLost = false;
       this.numberOfLaps = 0;
+      this.currentLapStart = this.startTime;
     }
 
     screenLoad(loading, time){
@@ -119,7 +118,7 @@ class Game {
       let overlay = document.getElementById("overlay");
       overlay.innerHTML = '';
       overlay.style.display = 'none';
-      this.hasWon = false;
+      changeHasWon(false);
       let menu = document.getElementById("menu");
       menu.style.display = 'block';
       handleState(isPlaying);
@@ -145,7 +144,7 @@ class Game {
       const timeElapsedS = timeElapsed * 0.001;
   
       if (this._controls && canMove) {
-        this.isInBounds = this._controls.Update(timeElapsedS, this.hasWon);
+        this.isInBounds = this._controls.Update(timeElapsedS);
         if(!this.isInBounds){
           canMove = false;
           this.isInBounds = true;
@@ -244,6 +243,10 @@ class Game {
     
             this.step(t - this._previousRAF);
             this._previousRAF = t;
+
+            if(hasWon){
+              console.log("has won");
+            }
     
             this.updateTimer();
           }
@@ -297,34 +300,102 @@ class Game {
       overlay.style.display = "block";
     }
 
-    updateTimer(){
+    // updateTimer(){
 
+    //   let endTime = new Date();
+    //   let timeDiff = endTime - this.startTime; //in ms
+    //   let timeSinceLastWin;
+    //   // strip the ms
+    //   timeDiff /= 1000;
+
+    //   // get seconds 
+    //   let seconds = Math.round(timeDiff);
+
+    //   if(seconds >= 1){
+    //     let timeLeft = this.counter - seconds;
+    //     if(timeLeft<=0){
+    //       this.hasLost = true;
+    //       timeLeft = 0;
+    //     }
+    //     let timer = document.getElementById('timer');
+    //     if(timer){
+    //       timer.innerHTML = `Time left: ${timeLeft}`;
+    //     }
+    //   }
+
+    //   if(hasWon){
+    //     let newWinningTime = new Date();
+    //     let lapsedTime = Math.round((newWinningTime - lastWinningTime) /= 1000);
+    //     timeSinceLastWin = lapsedTime;
+    //   }
+
+    //   if(hasWon && this.numberOfLaps < 3 && timeSinceLastWin > 5){
+    //     changeHasWon(hasWon);
+    //     this.numberOfLaps = this.numberOfLaps + 1;
+    //     this.currentLapStart = new Date();
+    //     let laps = document.getElementById('laps');
+    //     if(laps){
+    //       laps.innerHTML = `Laps: ${this.numberOfLaps}/3`;
+    //     }
+    //   }
+    // }
+
+    updateTimer() {
       let endTime = new Date();
       let timeDiff = endTime - this.startTime; //in ms
       // strip the ms
       timeDiff /= 1000;
-
-      // get seconds 
+  
+      // get seconds
       let seconds = Math.round(timeDiff);
-
-      if(seconds >= 1){
+  
+      let hasLapped = 0;
+      if (hasWon) {
+        // check if player really laped
+        let diff = endTime - this.currentLapStart; //in ms
+        // strip the ms
+        diff /= 1000;
+  
+        // get seconds
+        hasLapped = Math.round(diff);
+      }
+  
+      if (seconds >= 120) {
+        this.startTime = new Date();
+      }
+  
+      if (seconds >= 1) {
         let timeLeft = this.counter - seconds;
-        if(timeLeft<=0){
-          this.hasLost = true;
+        if (timeLeft <= 0) {
+          hasLost = true;
           timeLeft = 0;
         }
-        let timer = document.getElementById('timer');
-        if(timer){
+        let timer = document.getElementById("timer");
+        if (timer) {
           timer.innerHTML = `Time left: ${timeLeft}`;
         }
       }
-
-      if(this.hasWon && this.numberOfLaps < 3){
-        this.hasWon = false;
+  
+      if (hasLapped > 5 && this.numberOfLaps >= 1 && hasWon) {
+        changeHasWon(false);
         this.numberOfLaps = this.numberOfLaps + 1;
         this.currentLapStart = new Date();
-        let laps = document.getElementById('laps');
-        if(laps){
+        let laps = document.getElementById("laps");
+        if (laps) {
+          laps.innerHTML = `Laps: ${this.numberOfLaps}/3`;
+        }
+      }
+  
+      if (hasLapped < 5 && this.numberOfLaps >= 1 && hasWon) {
+        changeHasWon(false);
+      }
+  
+      if (hasWon && this.numberOfLaps < 3) {
+        changeHasWon(false);
+        this.numberOfLaps = this.numberOfLaps + 1;
+        this.currentLapStart = new Date();
+        let laps = document.getElementById("laps");
+        if (laps) {
           laps.innerHTML = `Laps: ${this.numberOfLaps}/3`;
         }
       }
@@ -350,8 +421,8 @@ class Game {
       this.drawStartLine(loader, y, scene);
       this.placeTrees(loader, y, scene);
       this.drawRoads(loader, y, scene);
-      this.drawCross(loader, y, scene);
-      this.drawBarriers(loader, y, scene);
+      // this.drawCross(loader, y, scene);
+      // this.drawBarriers(loader, y, scene);
       console.log("100% loaded");
 
     }
@@ -1772,6 +1843,9 @@ const params = {
   car1Or2,
 }
 
+export function changeHasWon(isWin){
+  hasWon = isWin;
+}
 
 export function handleState(isPlaying){
   if(isPlaying){
