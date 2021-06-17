@@ -1,3 +1,7 @@
+const engine = new Audio("./resources/eng.mp3");
+const boost = new Audio("./resources/turbo.mp3");
+const rev = new Audio("./resources/rev.wav");
+
 export class BasicCharacterControllerInput {
     constructor() {
       this._Init();    
@@ -20,21 +24,26 @@ export class BasicCharacterControllerInput {
       switch (event.keyCode) {
         case 87: // w
           this._keys.forward = true;
+          engine.play();
           break;
         case 65: // a
           this._keys.left = true;
+          // engine.play();
           break;
         case 83: // s
           this._keys.backward = true;
+          rev.play();
           break;
         case 68: // d
           this._keys.right = true;
+          // engine.play();
           break;
         case 32: // SPACE
           this._keys.space = true;
           break;
         case 16: // SHIFT
           this._keys.shift = true;
+          boost.play();
           break;
       }
     }
@@ -43,12 +52,16 @@ export class BasicCharacterControllerInput {
       switch(event.keyCode) {
         case 87: // w
           this._keys.forward = false;
+          engine.pause();
+          engine.currentTime = 0;
           break;
         case 65: // a
           this._keys.left = false;
           break;
         case 83: // s
           this._keys.backward = false;
+          rev.pause();
+          rev.currentTime = 0;
           break;
         case 68: // d
           this._keys.right = false;
@@ -58,6 +71,8 @@ export class BasicCharacterControllerInput {
           break;
         case 16: // SHIFT
           this._keys.shift = false;
+          boost.pause();
+          boost.currentTime = 0;
           break;
       }
     }
