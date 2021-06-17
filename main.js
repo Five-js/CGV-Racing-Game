@@ -41,7 +41,7 @@ class Game {
 
 
       // handle screen loading
-      this.screenLoad('Loading...', 10000);
+      this.screenLoad('Loading...', 100);
       // set up variables to be used
       this.setUpGlobalVariables();
       // in game menu
@@ -341,13 +341,13 @@ class Game {
       let y = this.y;
 
       // loading and placing the objects
-      // this.drawBuildings(y, scene);
+     this.drawBuildings(y, scene);
       this.drawCar(y, scene);
       this.drawStartLine(loader, y, scene);
       this.placeTrees(loader, y, scene);
       this.drawRoads(loader, y, scene);
-      // this.drawCross(loader, y, scene);
-      // this.drawBarriers(loader, y, scene);
+       this.drawCross(loader, y, scene);
+     this.drawBarriers(loader, y, scene);
       console.log("100% loaded");
 
     }
@@ -375,6 +375,11 @@ class Game {
       const building2 = './resources/buildingTxt/glassTxt.jpg';
       const building3 = './resources/buildingTxt/simpleTxt.jpg';
       const building4= './resources/buildingTxt/res.jpg';
+      const c = './resources/construction/one.jpg';
+      const c2 = './resources/construction/two.jpg';
+      const c3 = './resources/construction/three.jpg';
+      const c4 = './resources/construction/four.jpg';
+      const b = './resources/buildingTxt/n.jpg';
 
       // first one (middle)
       this.cluster(0, y, -50, building2, building, building3, building4, scene);
@@ -388,6 +393,9 @@ class Game {
       this.cluster(0, y, 270, building2, building, building3, building4, scene);
       // right most
       this.cluster(0, y, -210, building2, building, building3, building4, scene);
+      this.cluster(400, y, -210, c,c2, c3, c4, scene);
+      this.cluster(400, y, 50, b,b, b, b, scene);
+      this.cluster(300, y, 700, b,b, b, b, scene);
       
     }
 
@@ -1656,25 +1664,30 @@ class Game {
     skybox(){
       const loader = new THREE.CubeTextureLoader();
       const sky = loader.load([
-          './resources/humble_ft.jpg',
-          './resources/humble_bk.jpg',
-          './resources/humble_up.jpg',
-          './resources/humble_dn.jpg',
-          './resources/humble_rt.jpg',
-          './resources/humble_lf.jpg',
+          './resources/ocean_ft.jpg',
+          './resources/ocean_bk.jpg',
+          './resources/ocean_up.jpg',
+          './resources/ocean_dn.jpg',
+          './resources/ocean_rt.jpg',
+          './resources/ocean_lf.jpg',
       ]);
       this.scene.background = sky;
     }
 
-    ground(){
+    ground() {
       const textureLoader = new THREE.TextureLoader();
       const grass = new THREE.MeshBasicMaterial({
-        map: textureLoader.load('./resources/grass.jpg'),
+        map: textureLoader.load("./resources/pave.jpg", function (texture) {
+          texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+          texture.offset.set(0, 0);
+          texture.repeat.set(200, 200);
+        }),
       });
       const ground = new THREE.Mesh(
-          new THREE.PlaneGeometry(5000, 5000, 10, 10),
-          grass
-          );
+        new THREE.PlaneGeometry(5000, 5000, 10, 10),
+        grass
+      );
+  
       ground.castShadow = false;
       ground.receiveShadow = true;
       ground.position.y = -50;
