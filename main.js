@@ -39,7 +39,7 @@ class Game {
     init() {
       // TODO: fix tumis level, play everyones level
       // TODO: light effects: shadows, reflection, sun(point light), etc...
-
+      
 
       // handle screen loading
       this.screenLoad('Loading...', 10000);
