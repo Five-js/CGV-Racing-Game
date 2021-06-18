@@ -35,7 +35,7 @@ export class Vhugala {
 
         this.handleParams(params);
       // handle screen loading
-      this.screenLoad('Loading...', 15000);
+      this.screenLoad('Loading...', 10000);
       // set up variables to be used
       this.setUpGlobalVariables();
       // in game menu
@@ -343,123 +343,116 @@ export class Vhugala {
       let y = this.y;
 
 
-      
-
-
-
-
-
-
       // loading and placing the objects
-      loader.load('./resources/car_scene/scene.gltf',
-      // called when the resource is loaded
-      function ( gltf ) {
+      // loader.load('./resources/car_scene/scene.gltf',
+      // // called when the resource is loaded
+      // function ( gltf ) {
 
-        scene.add( gltf.scene );
-        let mesh = gltf.scene;
-          mesh.position.set(100,y-8,500);
-          mesh.scale.set(0.1,0.1,0.2);
-          mesh.rotation.set(0, Math.PI/2, 0);
-          scene.add( mesh );
+      //   scene.add( gltf.scene );
+      //   let mesh = gltf.scene;
+      //     mesh.position.set(100,y-8,500);
+      //     mesh.scale.set(0.1,0.1,0.2);
+      //     mesh.rotation.set(0, Math.PI/2, 0);
+      //     scene.add( mesh );
 
 
-        // gltf.animations; // Array<THREE.AnimationClip>
-        // gltf.scene; // THREE.Group
-        // gltf.scenes; // Array<THREE.Group>
-        // gltf.cameras; // Array<THREE.Camera>
-        // gltf.asset; // Object
+      //   // gltf.animations; // Array<THREE.AnimationClip>
+      //   // gltf.scene; // THREE.Group
+      //   // gltf.scenes; // Array<THREE.Group>
+      //   // gltf.cameras; // Array<THREE.Camera>
+      //   // gltf.asset; // Object
         
 
-      },
-      // called while loading is progressing
-      function ( xhr ) {
+      // },
+      // // called while loading is progressing
+      // function ( xhr ) {
 
-        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+      //   console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 
-      },
-      // called when loading has errors
-      function ( error ) {
+      // },
+      // // called when loading has errors
+      // function ( error ) {
 
-        console.log( error );
+      //   console.log( error );
 
-      })
-
-
-      //
-      loader.load('./resources/mudau/mall/scene.gltf',
-      // called when the resource is loaded
-      function ( gltf ) {
-
-        scene.add( gltf.scene );
-        let mesh = gltf.scene;
-          mesh.position.set(-100,y-8,-500);
-          mesh.scale.set(0.04,0.04,0.04);
-          mesh.rotation.set(0, Math.PI, 0);
-          scene.add( mesh );
+      // })
 
 
-        // gltf.animations; // Array<THREE.AnimationClip>
-        // gltf.scene; // THREE.Group
-        // gltf.scenes; // Array<THREE.Group>
-        // gltf.cameras; // Array<THREE.Camera>
-        // gltf.asset; // Object
+      // //
+      // loader.load('./resources/mudau/mall/scene.gltf',
+      // // called when the resource is loaded
+      // function ( gltf ) {
+
+      //   scene.add( gltf.scene );
+      //   let mesh = gltf.scene;
+      //     mesh.position.set(-100,y-8,-500);
+      //     mesh.scale.set(0.04,0.04,0.04);
+      //     mesh.rotation.set(0, Math.PI, 0);
+      //     scene.add( mesh );
+
+
+      //   // gltf.animations; // Array<THREE.AnimationClip>
+      //   // gltf.scene; // THREE.Group
+      //   // gltf.scenes; // Array<THREE.Group>
+      //   // gltf.cameras; // Array<THREE.Camera>
+      //   // gltf.asset; // Object
         
 
-      },
-      // called while loading is progressing
-      function ( xhr ) {
+      // },
+      // // called while loading is progressing
+      // function ( xhr ) {
 
-        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+      //   console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 
-      },
-      // called when loading has errors
-      function ( error ) {
+      // },
+      // // called when loading has errors
+      // function ( error ) {
 
-        console.log( error );
+      //   console.log( error );
 
-      })
+      // })
 
-      loader.load('./resources/mudau/school/scene.gltf',
-      // called when the resource is loaded
-      function ( gltf ) {
+      // loader.load('./resources/mudau/school/scene.gltf',
+      // // called when the resource is loaded
+      // function ( gltf ) {
 
-        scene.add( gltf.scene );
-        let mesh = gltf.scene;
-          mesh.position.set(-810,y-8,420);
-          mesh.scale.set(0.08,0.08,0.08);
-          mesh.rotation.set(0, Math.PI/2, 0);
-          scene.add( mesh );
+      //   scene.add( gltf.scene );
+      //   let mesh = gltf.scene;
+      //     mesh.position.set(-810,y-8,420);
+      //     mesh.scale.set(0.08,0.08,0.08);
+      //     mesh.rotation.set(0, Math.PI/2, 0);
+      //     scene.add( mesh );
 
 
-        // gltf.animations; // Array<THREE.AnimationClip>
-        // gltf.scene; // THREE.Group
-        // gltf.scenes; // Array<THREE.Group>
-        // gltf.cameras; // Array<THREE.Camera>
-        // gltf.asset; // Object
+      //   // gltf.animations; // Array<THREE.AnimationClip>
+      //   // gltf.scene; // THREE.Group
+      //   // gltf.scenes; // Array<THREE.Group>
+      //   // gltf.cameras; // Array<THREE.Camera>
+      //   // gltf.asset; // Object
         
 
-      },
-      // called while loading is progressing
-      function ( xhr ) {
+      // },
+      // // called while loading is progressing
+      // function ( xhr ) {
 
-        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+      //   console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 
-      },
-      // called when loading has errors
-      function ( error ) {
+      // },
+      // // called when loading has errors
+      // function ( error ) {
 
-        console.log( error );
+      //   console.log( error );
 
-      })
+      // })
       
-     this.drawBuildings(y, scene);
+    //  this.drawBuildings(y, scene);
       this.drawCar(y, scene);
       this.drawStartLine(loader, y, scene);
-      this.placeTrees(loader, y, scene);
+    //   this.placeTrees(loader, y, scene);
       this.drawRoads(loader, y, scene);
-       this.drawCross(loader, y, scene);
-     this.drawBarriers(loader, y, scene);
-     this.placeCroud(loader,y,scene);
+    //    this.drawCross(loader, y, scene);
+    //  this.drawBarriers(loader, y, scene);
+    //  this.placeCroud(loader,y,scene);
       console.log("100% loaded");
 
     }

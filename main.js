@@ -419,8 +419,8 @@ class Game {
       // loading and placing the objects
       // this.drawBuildings(y, scene);
       this.drawCar(y, scene);
-      this.drawStartLine(loader, y, scene);
-      this.placeTrees(loader, y, scene);
+      // this.drawStartLine(loader, y, scene);
+      // this.placeTrees(loader, y, scene);
       this.drawRoads(loader, y, scene);
       // this.drawCross(loader, y, scene);
       // this.drawBarriers(loader, y, scene);
@@ -1849,7 +1849,7 @@ class Game {
 }
 
 
-const params = {
+let params = {
   isPlaying,
   isPaused,
   isThirdPerson,
@@ -1868,12 +1868,15 @@ export function handleState(isPlaying){
       _APP = new Game();
     }
     else if(trackChosen==2){
+      params.isThirdPerson = isThirdPerson;
       _APP = new OT(params);
     }
     else if(trackChosen==3){
+      params.isThirdPerson = isThirdPerson;
       _APP = new Vhugala(params);
     }
     else if(trackChosen==4){
+      params.isThirdPerson = isThirdPerson;
       _APP = new Tumi(params);
     }
     // _APP = new Game();
@@ -1902,6 +1905,7 @@ export function handleState(isPlaying){
     };
 
     setUpTrack();
+    setUpCam();
   }
 }
 
@@ -1922,6 +1926,22 @@ function setUpTrack(){
   }
   DaTumingHills.onclick = (e) => {
     trackChosen = 4;
+  }
+}
+
+function setUpCam(){
+  let firstcamBtn = document.getElementById("1stcam");
+  let thirdcamBtn = document.getElementById("3rdcam");
+
+  firstcamBtn.onclick = (e) => {
+    isThirdPerson = false;
+    thirdcamBtn.style.display = 'block';
+    firstcamBtn.style.display = 'none';
+  }
+  thirdcamBtn.onclick = (e) => {
+    isThirdPerson = true;
+    thirdcamBtn.style.display = 'none';
+    firstcamBtn.style.display = 'block';
   }
 }
 

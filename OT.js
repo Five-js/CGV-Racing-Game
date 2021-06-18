@@ -129,6 +129,8 @@ export class OT {
     }
 
     restartGame(){
+      let overlay = document.getElementById('overlay');
+      overlay.style.display = 'none';
       canMove = false;
       this.screenLoad('Restarting Game, Please Wait..', 10000);
       this.carMesh.position.set(5,this.y-8.5,-50);
@@ -224,7 +226,7 @@ export class OT {
             this.step(t - this._previousRAF);
             this._previousRAF = t;
     
-            // this.updateTimer();
+            this.updateTimer();
           }
 
         });
@@ -409,174 +411,174 @@ export class OT {
       let y = this.y;
 
       // loading and placing the objects
-      loader.load('./resources/4_skyscraper/scene.gltf',
-      // called when the resource is loaded
-      function ( gltf ) {
+      // loader.load('./resources/4_skyscraper/scene.gltf',
+      // // called when the resource is loaded
+      // function ( gltf ) {
 
-        scene.add( gltf.scene );
-        let mesh = gltf.scene;
-          mesh.position.set(-200,y-8,600);
-          mesh.scale.set(1,2,1);
-          mesh.rotation.set(0,2* Math.PI/2, 0);
-          scene.add( mesh );
+      //   scene.add( gltf.scene );
+      //   let mesh = gltf.scene;
+      //     mesh.position.set(-200,y-8,600);
+      //     mesh.scale.set(1,2,1);
+      //     mesh.rotation.set(0,2* Math.PI/2, 0);
+      //     scene.add( mesh );
 
 
-        // gltf.animations; // Array<THREE.AnimationClip>
-        // gltf.scene; // THREE.Group
-        // gltf.scenes; // Array<THREE.Group>
-        // gltf.cameras; // Array<THREE.Camera>
-        // gltf.asset; // Object
+      //   // gltf.animations; // Array<THREE.AnimationClip>
+      //   // gltf.scene; // THREE.Group
+      //   // gltf.scenes; // Array<THREE.Group>
+      //   // gltf.cameras; // Array<THREE.Camera>
+      //   // gltf.asset; // Object
         
 
-      },
-      // called while loading is progressing
-      function ( xhr ) {
+      // },
+      // // called while loading is progressing
+      // function ( xhr ) {
 
-        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+      //   console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 
-      },
-      // called when loading has errors
-      function ( error ) {
+      // },
+      // // called when loading has errors
+      // function ( error ) {
 
-        console.log( error );
+      //   console.log( error );
 
-      })
-      loader.load('./resources/food/scene.gltf',
-      // called when the resource is loaded
-      function ( gltf ) {
+      // })
+      // loader.load('./resources/food/scene.gltf',
+      // // called when the resource is loaded
+      // function ( gltf ) {
 
-        scene.add( gltf.scene );
-        let mesh = gltf.scene;
-          mesh.position.set(0,y-8,600);
-          mesh.scale.set(3,5,2);
-          mesh.rotation.set(0,2* Math.PI/2, 0);
-          scene.add( mesh );
+      //   scene.add( gltf.scene );
+      //   let mesh = gltf.scene;
+      //     mesh.position.set(0,y-8,600);
+      //     mesh.scale.set(3,5,2);
+      //     mesh.rotation.set(0,2* Math.PI/2, 0);
+      //     scene.add( mesh );
 
 
-        // gltf.animations; // Array<THREE.AnimationClip>
-        // gltf.scene; // THREE.Group
-        // gltf.scenes; // Array<THREE.Group>
-        // gltf.cameras; // Array<THREE.Camera>
-        // gltf.asset; // Object
+      //   // gltf.animations; // Array<THREE.AnimationClip>
+      //   // gltf.scene; // THREE.Group
+      //   // gltf.scenes; // Array<THREE.Group>
+      //   // gltf.cameras; // Array<THREE.Camera>
+      //   // gltf.asset; // Object
         
 
-      },
-      // called while loading is progressing
-      function ( xhr ) {
+      // },
+      // // called while loading is progressing
+      // function ( xhr ) {
 
-        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+      //   console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 
-      },
-      // called when loading has errors
-      function ( error ) {
+      // },
+      // // called when loading has errors
+      // function ( error ) {
 
-        console.log( error );
+      //   console.log( error );
 
-      })
-      loader.load('./resources/truckshop_and_garage/scene.gltf',
-      // called when the resource is loaded
-      function ( gltf ) {
+      // })
+      // loader.load('./resources/truckshop_and_garage/scene.gltf',
+      // // called when the resource is loaded
+      // function ( gltf ) {
 
-        scene.add( gltf.scene );
-        let mesh = gltf.scene;
-          mesh.position.set(-300,y-10,-425);
-          mesh.scale.set(2.5,4.5,2.5);
-          mesh.rotation.set(0,4* Math.PI/2, 0);
-          scene.add( mesh );
+      //   scene.add( gltf.scene );
+      //   let mesh = gltf.scene;
+      //     mesh.position.set(-300,y-10,-425);
+      //     mesh.scale.set(2.5,4.5,2.5);
+      //     mesh.rotation.set(0,4* Math.PI/2, 0);
+      //     scene.add( mesh );
 
 
-        // gltf.animations; // Array<THREE.AnimationClip>
-        // gltf.scene; // THREE.Group
-        // gltf.scenes; // Array<THREE.Group>
-        // gltf.cameras; // Array<THREE.Camera>
-        // gltf.asset; // Object
+      //   // gltf.animations; // Array<THREE.AnimationClip>
+      //   // gltf.scene; // THREE.Group
+      //   // gltf.scenes; // Array<THREE.Group>
+      //   // gltf.cameras; // Array<THREE.Camera>
+      //   // gltf.asset; // Object
         
 
-      },
-      // called while loading is progressing
-      function ( xhr ) {
+      // },
+      // // called while loading is progressing
+      // function ( xhr ) {
 
-        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+      //   console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 
-      },
-      // called when loading has errors
-      function ( error ) {
+      // },
+      // // called when loading has errors
+      // function ( error ) {
 
-        console.log( error );
+      //   console.log( error );
 
-      })
-      loader.load('./resources/eiffel_tower/scene.gltf',
-      // called when the resource is loaded
-      function ( gltf ) {
+      // })
+      // loader.load('./resources/eiffel_tower/scene.gltf',
+      // // called when the resource is loaded
+      // function ( gltf ) {
 
-        scene.add( gltf.scene );
-        let mesh = gltf.scene;
-          mesh.position.set(-150,y-10,-150);
-          mesh.scale.set(15,18,15);
-          mesh.rotation.set(0,4* Math.PI/2, 0);
-          scene.add( mesh );
+      //   scene.add( gltf.scene );
+      //   let mesh = gltf.scene;
+      //     mesh.position.set(-150,y-10,-150);
+      //     mesh.scale.set(15,18,15);
+      //     mesh.rotation.set(0,4* Math.PI/2, 0);
+      //     scene.add( mesh );
 
 
-        // gltf.animations; // Array<THREE.AnimationClip>
-        // gltf.scene; // THREE.Group
-        // gltf.scenes; // Array<THREE.Group>
-        // gltf.cameras; // Array<THREE.Camera>
-        // gltf.asset; // Object
+      //   // gltf.animations; // Array<THREE.AnimationClip>
+      //   // gltf.scene; // THREE.Group
+      //   // gltf.scenes; // Array<THREE.Group>
+      //   // gltf.cameras; // Array<THREE.Camera>
+      //   // gltf.asset; // Object
         
 
-      },
-      // called while loading is progressing
-      function ( xhr ) {
+      // },
+      // // called while loading is progressing
+      // function ( xhr ) {
 
-        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+      //   console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 
-      },
-      // called when loading has errors
-      function ( error ) {
+      // },
+      // // called when loading has errors
+      // function ( error ) {
 
-        console.log( error );
+      //   console.log( error );
 
-      })
-      loader.load('./resources/camp_nou_stadium/scene.gltf',
-      // called when the resource is loaded
-      function ( gltf ) {
+      // })
+      // loader.load('./resources/camp_nou_stadium/scene.gltf',
+      // // called when the resource is loaded
+      // function ( gltf ) {
 
-        scene.add( gltf.scene );
-        let mesh = gltf.scene;
-          mesh.position.set(150,y-10,-300);
-          mesh.scale.set(0.02,0.03,0.02);
-          mesh.rotation.set(0,3.8* Math.PI/2, 0);
-          scene.add( mesh );
+      //   scene.add( gltf.scene );
+      //   let mesh = gltf.scene;
+      //     mesh.position.set(150,y-10,-300);
+      //     mesh.scale.set(0.02,0.03,0.02);
+      //     mesh.rotation.set(0,3.8* Math.PI/2, 0);
+      //     scene.add( mesh );
 
 
-        // gltf.animations; // Array<THREE.AnimationClip>
-        // gltf.scene; // THREE.Group
-        // gltf.scenes; // Array<THREE.Group>
-        // gltf.cameras; // Array<THREE.Camera>
-        // gltf.asset; // Object
+      //   // gltf.animations; // Array<THREE.AnimationClip>
+      //   // gltf.scene; // THREE.Group
+      //   // gltf.scenes; // Array<THREE.Group>
+      //   // gltf.cameras; // Array<THREE.Camera>
+      //   // gltf.asset; // Object
         
 
-      },
-      // called while loading is progressing
-      function ( xhr ) {
+      // },
+      // // called while loading is progressing
+      // function ( xhr ) {
 
-        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+      //   console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 
-      },
-      // called when loading has errors
-      function ( error ) {
+      // },
+      // // called when loading has errors
+      // function ( error ) {
 
-        console.log( error );
+      //   console.log( error );
 
-      })
+      // })
       
-       this.drawBuildings(y, scene);
+      //  this.drawBuildings(y, scene);
       this.drawCar(y, scene);
       this.drawStartLine(loader, y, scene);
-      this.placeTrees(loader,y,scene);
+      // this.placeTrees(loader,y,scene);
       this.drawRoads(loader, y, scene);
-      this.drawCross(loader, y, scene);
-      this.drawBarriers(loader, y, scene);
+      // this.drawCross(loader, y, scene);
+      // this.drawBarriers(loader, y, scene);
       console.log("100% loaded");
 
     }
@@ -727,7 +729,7 @@ export class OT {
         carMesh = this.Car(car2,car2Cabin);
       }
 
-      carMesh.position.set(-400,y-8.5,-250);
+      carMesh.position.set(5,y-8.5,-50);
       carMesh.scale.set(0.15,0.15,0.15);
 
       if(isThirdPerson){
