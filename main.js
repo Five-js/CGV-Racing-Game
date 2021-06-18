@@ -42,7 +42,7 @@ class Game {
 
 
       // handle screen loading
-      this.screenLoad('Loading...', 10000);
+      this.screenLoad('Loading...', 30000);
       // set up variables to be used
       this.setUpGlobalVariables();
       // in game menu
@@ -1821,6 +1821,7 @@ let params = {
   canMove,
   time,
   car1Or2,
+  hasWon: false
 }
 
 export function changeHasWon(isWin){
@@ -1878,7 +1879,7 @@ function setUpTrack(){
   let DeathCity = document.getElementById("track-1");
   let OTArena = document.getElementById("track-2");
   let TheVMCircuit = document.getElementById("track-3");
-  let DaTumingHills = document.getElementById("track-4");
+  // let DaTumingHills = document.getElementById("track-4");
 
   DeathCity.onclick = (e) => {
     trackChosen = 1;
@@ -1889,9 +1890,9 @@ function setUpTrack(){
   TheVMCircuit.onclick = (e) => {
     trackChosen = 3;
   }
-  DaTumingHills.onclick = (e) => {
-    trackChosen = 4;
-  }
+  // DaTumingHills.onclick = (e) => {
+  //   trackChosen = 4;
+  // }
 }
 
 function setUpCam(){
