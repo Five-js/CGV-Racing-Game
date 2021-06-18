@@ -29,6 +29,7 @@ let car2Cabin = 0x333333;
 let car1Or2 = 2;
 let trackChosen = 1;
 let hasWon = false;
+let stop = false;
 
 class Game {
     constructor() {
@@ -78,6 +79,7 @@ class Game {
       this.hasLost = false;
       this.numberOfLaps = 0;
       this.currentLapStart = this.startTime;
+      stop = false;
     }
 
     screenLoad(loading, time){
@@ -108,6 +110,7 @@ class Game {
     }
 
     stopGame(){
+      stop = true;
       this.numberOfLaps = 0;
       document.body.removeChild(this.renderer.domElement);
       isPlaying = false;
@@ -128,14 +131,20 @@ class Game {
     }
 
     restartGame(){
-      let overlay = document.getElementById('overlay');
-      overlay.style.display = 'none';
-      canMove = false;
       this.screenLoad('Restarting Game, Please Wait..', 10000);
-      this.carMesh.position.set(5,this.y-8.5,-50);
-      this.counter = time;
-      this.startTime = new Date();
-      this.currentLapStart = this.startTime;
+      this.numberOfLaps = 0;
+      document.body.removeChild(this.renderer.domElement);
+      isPlaying = false;
+      gameMenu.innerHTML = '';
+      let overlay = document.getElementById("overlay");
+      overlay.innerHTML = '';
+      overlay.style.display = 'none';
+      this.hasWon = false;
+      let menu = document.getElementById("menu");
+      menu.style.display = 'block';
+      canMove = false;
+      hasWon = false;
+      this.init();
     }
 
     step(timeElapsed) {
@@ -335,7 +344,7 @@ class Game {
         }
       }
   
-      if (hasLapped > 5 && this.numberOfLaps >= 1 && hasWon) {
+      if (hasLapped > 20 && this.numberOfLaps >= 1 && hasWon) {
         changeHasWon(false);
         this.numberOfLaps = this.numberOfLaps + 1;
         this.currentLapStart = new Date();
@@ -345,7 +354,7 @@ class Game {
         }
       }
   
-      if (hasLapped < 5 && this.numberOfLaps >= 1 && hasWon) {
+      if (hasLapped < 20 && this.numberOfLaps >= 1 && hasWon) {
         changeHasWon(false);
       }
   

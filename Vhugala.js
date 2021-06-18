@@ -29,11 +29,13 @@ let car2 = 0xff0000;
 let car2Cabin = 0x333333;
 let car1Or2 = 2;
 let hasWon = false;
+let stop = false;
 
 export class Vhugala {
     constructor(params) {
       // call initializing method
       this.init(params);
+      this.params = params;
     }
   
     init(params) {
@@ -85,6 +87,7 @@ export class Vhugala {
       this.isInBounds = true;
       this.hasLost = false;
       this.numberOfLaps = 0;
+      stop = false;
     }
 
     screenLoad(loading, time){
@@ -115,6 +118,7 @@ export class Vhugala {
     }
 
     stopGame(){
+      stop = true;
       this.numberOfLaps = 0;
       document.body.removeChild(this.renderer.domElement);
       isPlaying = false;
@@ -134,14 +138,18 @@ export class Vhugala {
     }
 
     restartGame(){
-      let overlay = document.getElementById('overlay');
-      overlay.style.display = 'none';
-      canMove = false;
       this.screenLoad('Restarting Game, Please Wait..', 10000);
-      this.carMesh.position.set(5,this.y-8.5,-50);
-      this.counter = time;
-      this.startTime = new Date();
-      this.currentLapStart = this.startTime;
+      this.numberOfLaps = 0;
+      document.body.removeChild(this.renderer.domElement);
+      isPlaying = false;
+      gameMenu.innerHTML = '';
+      let overlay = document.getElementById("overlay");
+      overlay.innerHTML = '';
+      overlay.style.display = 'none';
+      this.hasWon = false;
+      let menu = document.getElementById("menu");
+      menu.style.display = 'block';
+      this.init(this.params);
     }
 
     step(timeElapsed) {
@@ -340,7 +348,8 @@ export class Vhugala {
         }
       }
   
-      if (hasLapped > 5 && this.numberOfLaps >= 1 && hasWon) {
+      if (hasLapped > 20 && this.numberOfLaps >= 1 && hasWon) {
+        console.log(hasLapped);
         changeHasWon3(false);
         this.numberOfLaps = this.numberOfLaps + 1;
         this.currentLapStart = new Date();
@@ -350,7 +359,7 @@ export class Vhugala {
         }
       }
   
-      if (hasLapped < 5 && this.numberOfLaps >= 1 && hasWon) {
+      if (hasLapped < 20 && this.numberOfLaps >= 1 && hasWon) {
         changeHasWon3(false);
       }
   

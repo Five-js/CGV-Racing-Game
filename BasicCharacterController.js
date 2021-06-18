@@ -99,7 +99,7 @@ export class BasicCharacterController {
 
       let isInBounds = this.checkBounds();
   
-      if(this._target.position.x <= 55 && this._target.position.x >= -55 && this._target.position.z < -56.5 && this._target.position.z > -57.5){
+      if(this._target.position.x <= 55 && this._target.position.x >= -55 && this._target.position.z < -56 && this._target.position.z > -58){
         changeHasWon(true);
         changeHasWon2(true);
         changeHasWon3(true);
@@ -125,7 +125,7 @@ export class BasicCharacterController {
       }
 
       // second road
-      else if(x < 30 && x > -380 && z > 480 && z < 570){
+      else if(x < 30 && x > -390 && z > 480 && z < 570){
         isInBounds = true;
       }
 
@@ -140,7 +140,7 @@ export class BasicCharacterController {
       }
 
       // 5th road
-      else if(x < -640 && x > -690 && z > -110 && z < 310){
+      else if(x < -640 && x > -700 && z > -110 && z < 310){
         isInBounds = true;
       }
 
@@ -150,7 +150,7 @@ export class BasicCharacterController {
       }
 
       // 7th (shortest) road
-      else if(x < -425 && x > -468 && z > -280 && z < -60){
+      else if(x < -425 && x > -478 && z > -280 && z < -60){
         isInBounds = true;
       }
 

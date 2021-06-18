@@ -29,11 +29,13 @@ let car2 = 0xff0000;
 let car2Cabin = 0x333333;
 let car1Or2 = 2;
 let hasWon = false;
+let stop = false;
 
 export class OT {
   constructor(params) {
     // call initializing method
     this.init(params);
+    this.params = params;
   }
 
   init(params) {
@@ -79,6 +81,7 @@ export class OT {
     this.hasLost = false;
     this.numberOfLaps = 0;
     this.currentLapStart = this.startTime;
+    stop = false;
   }
 
   handleParams(params){
@@ -86,7 +89,7 @@ export class OT {
     isPaused = params.isPaused;
     isThirdPerson = params.isThirdPerson;
     canMove = params.canMove;
-    time = 192;
+    time = 222;
     car1Or2 = params.car1Or2;
   }
 
@@ -118,6 +121,7 @@ export class OT {
   }
 
   stopGame(){
+    stop = true;
     this.numberOfLaps = 0;
     document.body.removeChild(this.renderer.domElement);
     isPlaying = false;
@@ -137,14 +141,18 @@ export class OT {
   }
 
   restartGame(){
-    let overlay = document.getElementById('overlay');
-    overlay.style.display = 'none';
-    canMove = false;
     this.screenLoad('Restarting Game, Please Wait..', 10000);
-    this.carMesh.position.set(5,this.y-8.5,-50);
-    this.counter = time;
-    this.startTime = new Date();
-    this.currentLapStart = this.startTime;
+    this.numberOfLaps = 0;
+    document.body.removeChild(this.renderer.domElement);
+    isPlaying = false;
+    gameMenu.innerHTML = '';
+    let overlay = document.getElementById("overlay");
+    overlay.innerHTML = '';
+    overlay.style.display = 'none';
+    this.hasWon = false;
+    let menu = document.getElementById("menu");
+    menu.style.display = 'block';
+    this.init(this.params);
   }
 
   step(timeElapsed) {
@@ -217,6 +225,10 @@ export class OT {
 
   playInThirdPerson(){
     const game = this;
+
+    if(stop){
+      return;
+    }
 
     if(this.hasLost){
       this.numberOfLaps = 3;
@@ -344,7 +356,7 @@ export class OT {
       }
     }
 
-    if (hasLapped > 5 && this.numberOfLaps >= 1 && hasWon) {
+    if (hasLapped > 20 && this.numberOfLaps >= 1 && hasWon) {
       changeHasWon2(false);
       this.numberOfLaps = this.numberOfLaps + 1;
       this.currentLapStart = new Date();
@@ -354,7 +366,7 @@ export class OT {
       }
     }
 
-    if (hasLapped < 5 && this.numberOfLaps >= 1 && hasWon) {
+    if (hasLapped < 20 && this.numberOfLaps >= 1 && hasWon) {
       changeHasWon2(false);
     }
 
