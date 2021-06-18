@@ -97,7 +97,7 @@ export class BasicCharacterController {
 
       let isInBounds = this.checkBounds();
   
-      if(this._target.position.x <= 40 && this._target.position.x >= -30 && this._target.position.z < -56.9 && this._target.position.z > -57.1){
+      if(this._target.position.x <= 55 && this._target.position.x >= -55 && this._target.position.z < -56.5 && this._target.position.z > -57.5){
         changeHasWon(true);
         console.log("controller");
       }

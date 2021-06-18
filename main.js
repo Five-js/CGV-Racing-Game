@@ -37,10 +37,7 @@ class Game {
     }
   
     init() {
-      // TODO: uncomment load models
-      // TODO: use button to switch cameras
-      // TODO: remove sphere and play
-      // TODO: fix timer bug then run whole circuit once
+      // TODO: fix tumis level, play everyones level
       // TODO: light effects: shadows, reflection, sun(point light), etc...
 
 
@@ -301,45 +298,6 @@ class Game {
       overlay.style.display = "block";
     }
 
-    // updateTimer(){
-
-    //   let endTime = new Date();
-    //   let timeDiff = endTime - this.startTime; //in ms
-    //   let timeSinceLastWin;
-    //   // strip the ms
-    //   timeDiff /= 1000;
-
-    //   // get seconds 
-    //   let seconds = Math.round(timeDiff);
-
-    //   if(seconds >= 1){
-    //     let timeLeft = this.counter - seconds;
-    //     if(timeLeft<=0){
-    //       this.hasLost = true;
-    //       timeLeft = 0;
-    //     }
-    //     let timer = document.getElementById('timer');
-    //     if(timer){
-    //       timer.innerHTML = `Time left: ${timeLeft}`;
-    //     }
-    //   }
-
-    //   if(hasWon){
-    //     let newWinningTime = new Date();
-    //     let lapsedTime = Math.round((newWinningTime - lastWinningTime) /= 1000);
-    //     timeSinceLastWin = lapsedTime;
-    //   }
-
-    //   if(hasWon && this.numberOfLaps < 3 && timeSinceLastWin > 5){
-    //     changeHasWon(hasWon);
-    //     this.numberOfLaps = this.numberOfLaps + 1;
-    //     this.currentLapStart = new Date();
-    //     let laps = document.getElementById('laps');
-    //     if(laps){
-    //       laps.innerHTML = `Laps: ${this.numberOfLaps}/3`;
-    //     }
-    //   }
-    // }
 
     updateTimer() {
       let endTime = new Date();
@@ -361,14 +319,14 @@ class Game {
         hasLapped = Math.round(diff);
       }
   
-      if (seconds >= 120) {
-        this.startTime = new Date();
-      }
+      // if (seconds >= 120) {
+      //   this.startTime = new Date();
+      // }
   
       if (seconds >= 1) {
         let timeLeft = this.counter - seconds;
         if (timeLeft <= 0) {
-          hasLost = true;
+          this.hasLost = true;
           timeLeft = 0;
         }
         let timer = document.getElementById("timer");
@@ -417,13 +375,13 @@ class Game {
       let y = this.y;
 
       // loading and placing the objects
-      // this.drawBuildings(y, scene);
+      this.drawBuildings(y, scene);
       this.drawCar(y, scene);
-      // this.drawStartLine(loader, y, scene);
-      // this.placeTrees(loader, y, scene);
+      this.drawStartLine(loader, y, scene);
+      this.placeTrees(loader, y, scene);
       this.drawRoads(loader, y, scene);
-      // this.drawCross(loader, y, scene);
-      // this.drawBarriers(loader, y, scene);
+      this.drawCross(loader, y, scene);
+      this.drawBarriers(loader, y, scene);
       console.log("100% loaded");
 
     }
@@ -1749,10 +1707,9 @@ class Game {
       texture.repeat.set( 4, 4 );
       // const planeMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } )
       // const textureLoader = new THREE.TextureLoader();
-      const grass = new THREE.MeshPhongMaterial({
+      const grass = new THREE.MeshBasicMaterial({
         map: texture,
       });
-      grass.opacity = 1;
       const ground = new THREE.Mesh(
           new THREE.PlaneGeometry(5000, 5000, 10, 10),
           grass
@@ -1769,12 +1726,6 @@ class Game {
       this.skybox();
       this.ground();
       this.loadModels();
-      const sphereGeometry = new THREE.SphereGeometry( 5, 32, 32 );
-      const sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
-      const sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
-      sphere.castShadow = true; //default is false
-      sphere.receiveShadow = false; //default
-      this.scene.add( sphere );
     }
 
     setUpControls(){
@@ -1783,11 +1734,7 @@ class Game {
       controls.target.set(0, 20, 0);
       controls.update();
 
-      // this.joystick = new JoyStick({
-      //   game:this,
-      //   onMove:this.joystickCallback
-      // });
-      // this.js = { forward:0, turn:0 };
+      
     }
 
     setUpCamera(){
@@ -1804,26 +1751,44 @@ class Game {
     }
 
     setUpLights(){
-      let light = new THREE.DirectionalLight(0xffffff, 1);
-      light.position.set(-200, 500, 10);
-      // light.target.position.set(0, 0, 0);
+      // let light = new THREE.DirectionalLight(0xffffff, 1);
+      // light.position.set(-200, 500, 10);
+      // // light.target.position.set(0, 0, 0);
+      // light.castShadow = true;
+      // light.shadow.bias = -0.0001;
+      // light.shadow.mapSize.width = 1024*4;
+      // light.shadow.mapSize.height = 1024*4;
+      // light.shadow.camera.near = 0.1;
+      // light.shadow.camera.far = 2000;
+      // light.shadow.camera.left = 100;
+      // light.shadow.camera.right = -100;
+      // light.shadow.camera.top = 100;
+      // light.shadow.camera.bottom = -100;
+      // this.scene.add(light);
+
+      // // light = new THREE.AmbientLight(0x404040);
+      // // this.scene.add(light);
+
+      // const helper = new THREE.CameraHelper( light.shadow.camera );
+      // this.scene.add( helper );
+      let light = new THREE.DirectionalLight(0xFFFFFF, 1.0);
+      light.position.set(20, 100, 10);
+      light.target.position.set(0, 0, 0);
       light.castShadow = true;
-      light.shadow.bias = -0.0001;
-      light.shadow.mapSize.width = 1024*4;
-      light.shadow.mapSize.height = 1024*4;
+      light.shadow.bias = -0.001;
+      light.shadow.mapSize.width = 2048;
+      light.shadow.mapSize.height = 2048;
       light.shadow.camera.near = 0.1;
-      light.shadow.camera.far = 2000;
+      light.shadow.camera.far = 500.0;
+      light.shadow.camera.near = 0.5;
+      light.shadow.camera.far = 500.0;
       light.shadow.camera.left = 100;
       light.shadow.camera.right = -100;
       light.shadow.camera.top = 100;
       light.shadow.camera.bottom = -100;
       this.scene.add(light);
-
-      // light = new THREE.AmbientLight(0x404040);
-      // this.scene.add(light);
-
-      const helper = new THREE.CameraHelper( light.shadow.camera );
-      this.scene.add( helper );
+      light = new THREE.AmbientLight(0x404040);
+      this.scene.add(light);
     }
 
     setUpVisuals(){

@@ -509,6 +509,24 @@ i {
   background-repeat: no-repeat;
   background-position: center;
 }
+#track-2 .image {
+  background: url(/assets/background/track2.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+#track-3 .image {
+  background: url(/assets/background/track3.JPG);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+#track-4 .image {
+  background: url(/assets/background/track4.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
 
 #track-2,
 #track-2 p,
