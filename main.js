@@ -38,7 +38,8 @@ class Game {
   
     init() {
       // TODO: uncomment load models
-      // TODO: add button to switch between cameras automatically
+      // TODO: use button to switch cameras
+      // TODO: remove sphere and play
       // TODO: fix timer bug then run whole circuit once
       // TODO: light effects: shadows, reflection, sun(point light), etc...
 
@@ -1742,10 +1743,16 @@ class Game {
     }
 
     ground(){
-      const textureLoader = new THREE.TextureLoader();
-      const grass = new THREE.MeshBasicMaterial({
-        map: textureLoader.load('./resources/grass.jpg'),
+      const texture = new THREE.TextureLoader().load( "./resources/grass.jpg" );
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      texture.repeat.set( 4, 4 );
+      // const planeMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } )
+      // const textureLoader = new THREE.TextureLoader();
+      const grass = new THREE.MeshPhongMaterial({
+        map: texture,
       });
+      grass.opacity = 1;
       const ground = new THREE.Mesh(
           new THREE.PlaneGeometry(5000, 5000, 10, 10),
           grass
@@ -1762,6 +1769,12 @@ class Game {
       this.skybox();
       this.ground();
       this.loadModels();
+      const sphereGeometry = new THREE.SphereGeometry( 5, 32, 32 );
+      const sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+      const sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+      sphere.castShadow = true; //default is false
+      sphere.receiveShadow = false; //default
+      this.scene.add( sphere );
     }
 
     setUpControls(){
@@ -1791,24 +1804,26 @@ class Game {
     }
 
     setUpLights(){
-      let light = new THREE.DirectionalLight(0xFFFFFF, 1.0);
-      light.position.set(20, 100, 10);
-      light.target.position.set(0, 0, 0);
+      let light = new THREE.DirectionalLight(0xffffff, 1);
+      light.position.set(-200, 500, 10);
+      // light.target.position.set(0, 0, 0);
       light.castShadow = true;
-      light.shadow.bias = -0.001;
-      light.shadow.mapSize.width = 2048;
-      light.shadow.mapSize.height = 2048;
+      light.shadow.bias = -0.0001;
+      light.shadow.mapSize.width = 1024*4;
+      light.shadow.mapSize.height = 1024*4;
       light.shadow.camera.near = 0.1;
-      light.shadow.camera.far = 500.0;
-      light.shadow.camera.near = 0.5;
-      light.shadow.camera.far = 500.0;
+      light.shadow.camera.far = 2000;
       light.shadow.camera.left = 100;
       light.shadow.camera.right = -100;
       light.shadow.camera.top = 100;
       light.shadow.camera.bottom = -100;
       this.scene.add(light);
-      light = new THREE.AmbientLight(0x404040);
-      this.scene.add(light);
+
+      // light = new THREE.AmbientLight(0x404040);
+      // this.scene.add(light);
+
+      const helper = new THREE.CameraHelper( light.shadow.camera );
+      this.scene.add( helper );
     }
 
     setUpVisuals(){
