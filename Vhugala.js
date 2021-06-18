@@ -10,6 +10,10 @@ import {BasicCharacterController} from './BasicCharacterController.js';
 import {ThirdPersonCamera} from './ThirdPersonCamera.js';
 import {handleState} from './main.js';
 
+export function changeHasWon3(isWin){
+  hasWon = isWin;
+}
+
 // physics
 
 let isPlaying;
@@ -24,6 +28,7 @@ let car1Cabin = 0x000000;
 let car2 = 0xff0000;
 let car2Cabin = 0x333333;
 let car1Or2 = 2;
+let hasWon = false;
 
 export class Vhugala {
     constructor(params) {
@@ -35,7 +40,7 @@ export class Vhugala {
 
         this.handleParams(params);
       // handle screen loading
-      this.screenLoad('Loading...', 10000);
+      this.screenLoad('Loading...', 30000);
       // set up variables to be used
       this.setUpGlobalVariables();
       // in game menu
@@ -59,7 +64,7 @@ export class Vhugala {
         isPaused = params.isPaused;
         isThirdPerson = params.isThirdPerson;
         canMove = params.canMove;
-        time = params.time;
+        time = 192;
         car1Or2 = params.car1Or2;
     }
 
@@ -242,6 +247,10 @@ export class Vhugala {
     
             this.step(t - this._previousRAF);
             this._previousRAF = t;
+
+            if(hasWon){
+              console.log("has won");
+            }
     
             this.updateTimer();
           }
@@ -332,7 +341,7 @@ export class Vhugala {
       }
   
       if (hasLapped > 5 && this.numberOfLaps >= 1 && hasWon) {
-        changeHasWon(false);
+        changeHasWon3(false);
         this.numberOfLaps = this.numberOfLaps + 1;
         this.currentLapStart = new Date();
         let laps = document.getElementById("laps");
@@ -342,11 +351,11 @@ export class Vhugala {
       }
   
       if (hasLapped < 5 && this.numberOfLaps >= 1 && hasWon) {
-        changeHasWon(false);
+        changeHasWon3(false);
       }
   
       if (hasWon && this.numberOfLaps < 3) {
-        changeHasWon(false);
+        changeHasWon3(false);
         this.numberOfLaps = this.numberOfLaps + 1;
         this.currentLapStart = new Date();
         let laps = document.getElementById("laps");

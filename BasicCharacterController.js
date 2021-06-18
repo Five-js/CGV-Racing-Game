@@ -1,6 +1,8 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
 import {BasicCharacterControllerInput} from './BasicCharacterControllerInput.js';
 import {changeHasWon} from './main.js';
+import {changeHasWon2} from './OT.js';
+import {changeHasWon3} from './Vhugala.js';
 
 export class BasicCharacterController {
     constructor(params) {
@@ -99,6 +101,8 @@ export class BasicCharacterController {
   
       if(this._target.position.x <= 55 && this._target.position.x >= -55 && this._target.position.z < -56.5 && this._target.position.z > -57.5){
         changeHasWon(true);
+        changeHasWon2(true);
+        changeHasWon3(true);
         console.log("controller");
       }
 
@@ -116,7 +120,7 @@ export class BasicCharacterController {
       // rotated is x
 
       // first stretch
-      if(x < 30 && x > -20 && z > -350 && z < 535){
+      if(x < 30 && x > -20 && z > -350 && z < 530){
         isInBounds = true;
       }
 
@@ -126,12 +130,12 @@ export class BasicCharacterController {
       }
 
       // third road
-      else if(x < -320 && x > -380 && z > 260 && z < 570){
+      else if(x < -320 && x > -390 && z > 260 && z < 570){
         isInBounds = true;
       }
 
       // fourth road
-      else if(x < -320 && x > -690 && z > 260 && z < 310){
+      else if(x < -320 && x > -700 && z > 260 && z < 310){
         isInBounds = true;
       }
 
