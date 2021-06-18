@@ -1,0 +1,11 @@
+Model Information:
+* title:	Hungry Jack's Restaurant
+* source:	https://sketchfab.com/3d-models/hungry-jacks-restaurant-690889caa5814304bba1a76e04eb3dc7
+* author:	Jotrain (https://sketchfab.com/Jotrain)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Hungry Jack's Restaurant" (https://sketchfab.com/3d-models/hungry-jacks-restaurant-690889caa5814304bba1a76e04eb3dc7) by Jotrain (https://sketchfab.com/Jotrain) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

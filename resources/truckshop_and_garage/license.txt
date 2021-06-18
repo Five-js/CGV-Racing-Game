@@ -1,0 +1,11 @@
+Model Information:
+* title:	TruckShop and Garage
+* source:	https://sketchfab.com/3d-models/truckshop-and-garage-6061946bc7e740dab1845470d67616a7
+* author:	SCADL & Partners (https://sketchfab.com/scadl)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "TruckShop and Garage" (https://sketchfab.com/3d-models/truckshop-and-garage-6061946bc7e740dab1845470d67616a7) by SCADL & Partners (https://sketchfab.com/scadl) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
