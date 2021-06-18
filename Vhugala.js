@@ -35,7 +35,7 @@ export class Vhugala {
 
         this.handleParams(params);
       // handle screen loading
-      this.screenLoad('Loading...', 10000);
+      this.screenLoad('Loading...', 15000);
       // set up variables to be used
       this.setUpGlobalVariables();
       // in game menu
