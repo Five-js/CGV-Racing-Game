@@ -16,7 +16,7 @@ import {Tumi} from './Tumi.js';
 
 let isPlaying = false;
 let isPaused = false;
-let isThirdPerson = false;
+let isThirdPerson = true;
 let _APP = null;
 let canMove = false;
 const time = 252; //always add 12 seconds to time you want
@@ -420,7 +420,7 @@ class Game {
       // this.drawBuildings(y, scene);
       this.drawCar(y, scene);
       this.drawStartLine(loader, y, scene);
-      // this.placeTrees(loader, y, scene);
+      this.placeTrees(loader, y, scene);
       this.drawRoads(loader, y, scene);
       // this.drawCross(loader, y, scene);
       // this.drawBarriers(loader, y, scene);

@@ -1,0 +1,11 @@
+Model Information:
+* title:	HILLS INGRAD
+* source:	https://sketchfab.com/3d-models/hills-ingrad-2401ea66f7ad45e0b1699da0eeb6f440
+* author:	Nikitos & 3130 (https://sketchfab.com/vrcityphoto)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "HILLS INGRAD" (https://sketchfab.com/3d-models/hills-ingrad-2401ea66f7ad45e0b1699da0eeb6f440) by Nikitos & 3130 (https://sketchfab.com/vrcityphoto) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

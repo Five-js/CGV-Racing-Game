@@ -35,7 +35,7 @@ export class Vhugala {
 
         this.handleParams(params);
       // handle screen loading
-      this.screenLoad('Loading...', 100);
+      this.screenLoad('Loading...', 15000);
       // set up variables to be used
       this.setUpGlobalVariables();
       // in game menu
@@ -342,7 +342,116 @@ export class Vhugala {
       let scene = this.scene;
       let y = this.y;
 
+
+      
+
+
+
+
+
+
       // loading and placing the objects
+      loader.load('./resources/car_scene/scene.gltf',
+      // called when the resource is loaded
+      function ( gltf ) {
+
+        scene.add( gltf.scene );
+        let mesh = gltf.scene;
+          mesh.position.set(100,y-8,500);
+          mesh.scale.set(0.1,0.1,0.2);
+          mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+
+        // gltf.animations; // Array<THREE.AnimationClip>
+        // gltf.scene; // THREE.Group
+        // gltf.scenes; // Array<THREE.Group>
+        // gltf.cameras; // Array<THREE.Camera>
+        // gltf.asset; // Object
+        
+
+      },
+      // called while loading is progressing
+      function ( xhr ) {
+
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+      },
+      // called when loading has errors
+      function ( error ) {
+
+        console.log( error );
+
+      })
+
+
+      //
+      loader.load('./resources/mudau/mall/scene.gltf',
+      // called when the resource is loaded
+      function ( gltf ) {
+
+        scene.add( gltf.scene );
+        let mesh = gltf.scene;
+          mesh.position.set(-100,y-8,-500);
+          mesh.scale.set(0.04,0.04,0.04);
+          mesh.rotation.set(0, Math.PI, 0);
+          scene.add( mesh );
+
+
+        // gltf.animations; // Array<THREE.AnimationClip>
+        // gltf.scene; // THREE.Group
+        // gltf.scenes; // Array<THREE.Group>
+        // gltf.cameras; // Array<THREE.Camera>
+        // gltf.asset; // Object
+        
+
+      },
+      // called while loading is progressing
+      function ( xhr ) {
+
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+      },
+      // called when loading has errors
+      function ( error ) {
+
+        console.log( error );
+
+      })
+
+      loader.load('./resources/mudau/school/scene.gltf',
+      // called when the resource is loaded
+      function ( gltf ) {
+
+        scene.add( gltf.scene );
+        let mesh = gltf.scene;
+          mesh.position.set(-810,y-8,420);
+          mesh.scale.set(0.08,0.08,0.08);
+          mesh.rotation.set(0, Math.PI/2, 0);
+          scene.add( mesh );
+
+
+        // gltf.animations; // Array<THREE.AnimationClip>
+        // gltf.scene; // THREE.Group
+        // gltf.scenes; // Array<THREE.Group>
+        // gltf.cameras; // Array<THREE.Camera>
+        // gltf.asset; // Object
+        
+
+      },
+      // called while loading is progressing
+      function ( xhr ) {
+
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+      },
+      // called when loading has errors
+      function ( error ) {
+
+        console.log( error );
+
+      })
+      
      this.drawBuildings(y, scene);
       this.drawCar(y, scene);
       this.drawStartLine(loader, y, scene);
@@ -350,9 +459,17 @@ export class Vhugala {
       this.drawRoads(loader, y, scene);
        this.drawCross(loader, y, scene);
      this.drawBarriers(loader, y, scene);
+     this.placeCroud(loader,y,scene);
       console.log("100% loaded");
 
     }
+
+    placeCroud(loader,y,scene){
+      this.drawCroud(loader,y,scene,-900,80)
+    }
+
+
+    
 
     placeTrees(loader, y, scene){
       // first one
@@ -373,14 +490,13 @@ export class Vhugala {
     }
     
     drawBuildings(y, scene){
-      const building = './resources/buildingTxt/buldingTexture.png';
-      const building2 = './resources/buildingTxt/glassTxt.jpg';
+      const building = './resources/mudau/four.jpg';
+      const building2 = './resources/mudau/five.jpg';
       const building3 = './resources/buildingTxt/simpleTxt.jpg';
       const building4= './resources/buildingTxt/res.jpg';
-      const c = './resources/construction/one.jpg';
-      const c2 = './resources/construction/two.jpg';
-      const c3 = './resources/construction/three.jpg';
-      const c4 = './resources/construction/four.jpg';
+      const c = './resources/buildingTxt/blt.jpg';
+      
+     
       const b = './resources/buildingTxt/n.jpg';
 
       // first one (middle)
@@ -395,7 +511,7 @@ export class Vhugala {
       this.cluster(0, y, 270, building2, building, building3, building4, scene);
       // right most
       this.cluster(0, y, -210, building2, building, building3, building4, scene);
-      this.cluster(400, y, -210, c,c2, c3, c4, scene);
+      this.cluster(400, y, -210, c,c, c, c, scene);
       this.cluster(400, y, 50, b,b, b, b, scene);
       this.cluster(300, y, 700, b,b, b, b, scene);
       
@@ -1448,7 +1564,41 @@ export class Vhugala {
         }
       );
     }
+    drawCroud(loader,y,scene,x,z){
+      loader.load('./resources/mudau/park/scene.gltf',
+      // called when the resource is loaded
+      function ( gltf ) {
 
+        scene.add( gltf.scene );
+        let mesh = gltf.scene;
+          mesh.position.set(x,y-8,z);
+          mesh.scale.set(0.15,0.15,0.15);
+          mesh.rotation.set(0, Math.PI, 0);
+          scene.add( mesh );
+
+
+        // gltf.animations; // Array<THREE.AnimationClip>
+        // gltf.scene; // THREE.Group
+        // gltf.scenes; // Array<THREE.Group>
+        // gltf.cameras; // Array<THREE.Camera>
+        // gltf.asset; // Object
+        
+
+      },
+      // called while loading is progressing
+      function ( xhr ) {
+
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+      },
+      // called when loading has errors
+      function ( error ) {
+
+        console.log( error );
+
+      })
+
+    }
     drawTrees(loader, y, scene, x, z){
       const tree =  './resources/tree/scene.gltf';
       // going left trees
