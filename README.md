@@ -48,3 +48,5 @@ us overcome obstacles that we would have otherwise found difficult to tackle. An
 note is also that due to the shear number of objects to be rendered in the game, if you are running
 on limited GPU power, the first few frames of rendering might cause a lag but then will smooth out
 as you play the game further, a risk we thought was worth it for visual appeal.
+
+link to demo video: https://drive.google.com/file/d/1fHxcf1EQrRI-rd9dFjPT_0rl_h6oafBc/view?usp=sharing
